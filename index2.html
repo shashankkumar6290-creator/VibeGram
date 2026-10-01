@@ -378,15 +378,15 @@
       document.getElementById('mode-image-btn').className = mode === 'image' ? 'px-3 py-1 rounded-lg text-xs font-semibold text-white bg-brand-600' : 'px-3 py-1 rounded-lg text-xs font-medium text-slate-400';
     }
 
-    function startNewChat() {
-      currentChatId = Date.now().toString();
-      chats[currentChatId] = { id: currentChatId, title: 'New Chat', messages: [] };
-      renderChatHistoryList();
-      document.getElementById('chat-messages').innerHTML = '';
-      document.getElementById('chat-messages').appendChild(document.getElementById('welcome-screen'));
-      document.getElementById('welcome-screen').style.display = 'block';
-    }
-
+    
+function startNewChat() {
+    currentChatId = Date.now().toString();
+    chats[currentChatId] = { id: currentChatId, title: 'New Chat', messages: [] };
+    renderChatHistoryList();
+    
+    const chatMessages = document.getElementById('chat-messages');
+    if (chatMessages) chatMessages.innerHTML = '';
+}
     function renderChatHistoryList() {
       const list = document.getElementById('chat-history-list');
       list.innerHTML = '';
@@ -402,12 +402,14 @@
     function loadChat(id) {
       currentChatId = id;
       document.getElementById('chat-messages').innerHTML = '';
-      document.getElementById('welcome-screen').style.display = 'none';
+      const welcomeScreen = document.getElementById('welcome-screen');
+if (welcomeScreen) welcomeScreen.style.display = 'none';
       chats[id].messages.forEach(msg => appendMessageUI(msg.role, msg.content, msg.type));
     }
 
     function appendMessageUI(role, content, type = 'text') {
-      document.getElementById('welcome-screen').style.display = 'none';
+      const welcomeScreen = document.getElementById('welcome-screen');
+if (welcomeScreen) welcomeScreen.style.display = 'none';
       const container = document.getElementById('chat-messages');
       const isUser = role === 'user';
       const msgDiv = document.createElement('div');
