@@ -398,7 +398,26 @@ function startNewChat() {
         list.appendChild(btn);
       });
     }
+function sendOtp() {
+    const phoneInput = document.getElementById('user-phone-input').value;
+    
+    if (!phoneInput || phoneInput.trim() === '') {
+        alert('Please enter a mobile number.');
+        return;
+    }
 
+    // Unhide the verification code section
+    const otpStep = document.getElementById('otp-step');
+    if (otpStep) {
+        otpStep.classList.remove('hidden');
+    }
+
+    // Pre-fill 123456 into the verification input if it exists
+    const otpInput = document.getElementById('otp-input');
+    if (otpInput) {
+        otpInput.value = '123456';
+    }
+}
     function loadChat(id) {
       currentChatId = id;
       document.getElementById('chat-messages').innerHTML = '';
