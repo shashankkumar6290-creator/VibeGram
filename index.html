@@ -56,7 +56,7 @@
               class="flex-1 bg-dark-bg border border-dark-border rounded-xl py-3 px-4 text-white font-mono">
           </div>
         </div>
-        <button onclick="sendOtp()" class="w-full bg-brand-600 hover:bg-brand-500 text-white font-semibold py-3 rounded-xl flex items-center justify-center gap-2">
+        <button id="get-otp-btn" type="button" class="w-full bg-brand-600 hover:bg-brand-500 text-white font-semibold py-3">
           <span>Get Verification Code</span>
           <i data-lucide="arrow-right" class="w-4 h-4"></i>
         </button>
@@ -528,5 +528,27 @@ if (welcomeScreen) welcomeScreen.style.display = 'none';
         }
     } catch (err) {
         loadingDiv.querySelector('.prose').innerHTML = `<span class="text-rose-400">Error: ${err.message}</span>`;
+      }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const getOtpBtn = document.getElementById('get-otp-btn');
+    if (getOtpBtn) {
+        getOtpBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            const otpStep = document.getElementById('otp-step');
+            if (otpStep) {
+                otpStep.classList.remove('hidden');
+            }
+            const otpInput = document.getElementById('otp-input');
+            if (otpInput) {
+                otpInput.value = '123456';
+            }
+        });
+    }
+});
+</script>
+</body>
+</html>
     }
 }
