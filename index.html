@@ -398,8 +398,8 @@ function startNewChat() {
         list.appendChild(btn);
       });
     }
-function sendOtp() {
-    const phoneInput = document.getElementById('user-phone-input').value;
+window.sendOtp = function() {
+    const phoneInput = document.getElementById('user-phone-input') ? document.getElementById('user-phone-input').value : '';
     
     if (!phoneInput || phoneInput.trim() === '') {
         alert('Please enter a mobile number.');
@@ -412,11 +412,12 @@ function sendOtp() {
         otpStep.classList.remove('hidden');
     }
 
-    // Pre-fill 123456 into the verification input if it exists
+    // Pre-fill 123456 into the verification input
     const otpInput = document.getElementById('otp-input');
     if (otpInput) {
         otpInput.value = '123456';
     }
+};
 }
     function loadChat(id) {
       currentChatId = id;
