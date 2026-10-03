@@ -3,282 +3,213 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BeatStream | Premium Music Streaming</title>
+    <title>WallPaperVault | 4K Ultra HD Wallpapers</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .glass-panel { background: rgba(18, 18, 18, 0.85); backdrop-filter: blur(12px); }
+        .watermark-overlay {
+            background: repeating-linear-gradient(
+                -45deg,
+                rgba(255, 255, 255, 0.08),
+                rgba(255, 255, 255, 0.08) 15px,
+                transparent 15px,
+                transparent 30px
+            );
+        }
     </style>
 </head>
-<body class="bg-black text-zinc-100 font-sans min-h-screen select-none pb-28">
-
-    <!-- Mobile Login Screen -->
-    <div id="loginScreen" class="fixed inset-0 bg-black/95 backdrop-blur-xl z-50 flex items-center justify-center p-6">
-        <div class="w-full max-w-sm space-y-6 text-center bg-zinc-900/90 border border-zinc-800 p-8 rounded-3xl shadow-2xl">
-            <div class="flex items-center justify-center space-x-2">
-                <i class="fa-solid fa-compact-disc text-green-500 text-3xl animate-spin" style="animation-duration: 8s;"></i>
-                <h1 class="text-3xl font-black text-white tracking-wider">BEATSTREAM</h1>
-            </div>
-            <p class="text-xs text-zinc-400">Enter your mobile number to start streaming</p>
-            <div class="space-y-4 text-left">
-                <div>
-                    <label class="text-[11px] text-zinc-400 font-semibold block mb-1">Mobile Number</label>
-                    <div class="flex items-center bg-zinc-950 border border-zinc-800 rounded-xl overflow-hidden focus-within:border-green-500 transition">
-                        <span class="px-3 text-xs text-zinc-400 border-r border-zinc-800 font-mono">+91</span>
-                        <input type="tel" id="userPhone" maxlength="10" placeholder="9876543210" class="w-full bg-transparent text-xs text-white p-3.5 focus:outline-none font-mono tracking-widest">
-                    </div>
-                </div>
-                <button onclick="loginUser()" class="w-full bg-green-500 hover:bg-green-600 text-black font-bold text-xs py-3.5 rounded-xl transition shadow-lg shadow-green-500/20 uppercase tracking-wider">Start Listening</button>
-            </div>
-        </div>
-    </div>
+<body class="bg-zinc-950 text-zinc-100 font-sans min-h-screen">
 
     <!-- Navigation Header -->
-    <nav class="flex items-center justify-between px-6 py-4 bg-zinc-950/80 sticky top-0 z-40 backdrop-blur-md border-b border-zinc-900">
-        <div class="flex items-center space-x-3">
-            <i class="fa-solid fa-compact-disc text-green-500 text-2xl"></i>
-            <span class="text-white text-xl font-black tracking-wider">BEATSTREAM</span>
+    <nav class="flex items-center justify-between px-6 py-4 bg-zinc-900 border-b border-zinc-800 sticky top-0 z-40">
+        <div class="flex items-center space-x-2">
+            <i class="fa-solid fa-image text-indigo-500 text-2xl"></i>
+            <span class="text-xl font-black tracking-wider text-white">WALLPAPER<span class="text-indigo-500">VAULT</span></span>
         </div>
-
-        <div class="flex items-center space-x-4">
-            <div id="subStatusBadge" class="flex items-center space-x-1.5 bg-zinc-900 border border-zinc-800 px-3 py-1 rounded-full text-[11px] font-semibold">
-                <span class="w-2 h-2 rounded-full bg-zinc-500" id="badgeDot"></span>
-                <span id="badgeText" class="text-zinc-400">Free Tier</span>
-            </div>
-
-            <button onclick="openPaymentModal()" id="premiumUpgradeBtn" class="bg-green-500 hover:bg-green-400 text-black text-xs font-extrabold px-4 py-2 rounded-full transition shadow-md flex items-center space-x-1.5">
-                <i class="fa-solid fa-crown text-[11px]"></i>
-                <span>Get Premium ₹10</span>
-            </button>
-
-            <div class="flex items-center space-x-2 border-l border-zinc-800 pl-4">
-                <span id="navPhone" class="text-xs font-mono text-zinc-400 hidden sm:inline"></span>
-                <button onclick="logoutUser()" title="Logout" class="text-zinc-400 hover:text-white text-xs p-2">
-                    <i class="fa-solid fa-right-from-bracket"></i>
-                </button>
-            </div>
+        <div class="flex items-center space-x-3">
+            <span class="text-[10px] bg-indigo-950 text-indigo-400 border border-indigo-800/50 px-2.5 py-1 rounded-full font-mono font-bold uppercase tracking-wider">4K Ultra HD</span>
         </div>
     </nav>
 
-    <!-- Ad Banner -->
-    <div id="adBanner" class="bg-gradient-to-r from-purple-900/60 to-indigo-900/60 border-b border-purple-500/20 px-6 py-2.5 flex items-center justify-between text-xs">
-        <div class="flex items-center space-x-2">
-            <span class="bg-purple-500 text-black font-bold text-[9px] px-1.5 py-0.5 rounded uppercase">Ad</span>
-            <span class="text-zinc-200">Upgrade to <strong>Premium (₹10/mo)</strong> for offline downloads & zero ads!</span>
+    <!-- Main Content Container -->
+    <div class="max-w-7xl mx-auto p-6 space-y-6">
+
+        <!-- Category & Format Filter Tabs -->
+        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-800 pb-4">
+            <div class="flex flex-wrap items-center gap-2">
+                <button onclick="filterCategory('all')" id="catAll" class="px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white transition">All Wallpapers</button>
+                <button onclick="filterCategory('boys')" id="catBoys" class="px-4 py-2 rounded-xl text-xs font-bold bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800 transition">Boys (Cars/Gaming)</button>
+                <button onclick="filterCategory('girls')" id="catGirls" class="px-4 py-2 rounded-xl text-xs font-bold bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800 transition">Girls (Aesthetic/Anime)</button>
+            </div>
+
+            <div class="flex items-center space-x-2 bg-zinc-900 p-1 rounded-xl border border-zinc-800">
+                <button onclick="filterFormat('all')" id="fmtAll" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-zinc-800 text-white">All Devices</button>
+                <button onclick="filterFormat('phone')" id="fmtPhone" class="px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-400 hover:text-white"><i class="fa-solid fa-mobile-screen mr-1"></i> Phone</button>
+                <button onclick="filterFormat('pc')" id="fmtPc" class="px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-400 hover:text-white"><i class="fa-solid fa-desktop mr-1"></i> PC Desktop</button>
+            </div>
         </div>
-        <button onclick="openPaymentModal()" class="text-green-400 font-bold hover:underline">Upgrade Now</button>
+
+        <!-- Wallpaper Gallery Grid -->
+        <div id="wallpaperGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
     </div>
 
-    <!-- Main Content -->
-    <div class="p-6 max-w-7xl mx-auto space-y-8">
-        <div class="flex flex-col sm:flex-row gap-4 items-center justify-between">
-            <div class="relative w-full sm:max-w-md">
-                <input type="text" id="searchInput" onkeyup="handleSearch(event)" placeholder="Search songs..." class="w-full bg-zinc-900 border border-zinc-800 text-xs text-white px-4 py-3 rounded-full focus:outline-none focus:border-green-500 transition pl-10">
-                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-zinc-500 text-xs"></i>
-            </div>
-            <div class="flex items-center space-x-2 bg-zinc-900 p-1 rounded-full border border-zinc-800 w-full sm:w-auto justify-center">
-                <button onclick="switchTab('home')" id="tabHome" class="px-5 py-1.5 rounded-full text-xs font-bold bg-green-500 text-black transition">Home</button>
-                <button onclick="switchTab('downloads')" id="tabDownloads" class="px-5 py-1.5 rounded-full text-xs font-bold text-zinc-400 hover:text-white transition flex items-center space-x-1.5">
-                    <i class="fa-solid fa-circle-down"></i>
-                    <span>Downloads</span>
-                </button>
-            </div>
-        </div>
-
-        <div id="viewHome" class="space-y-8">
-            <div>
-                <h2 class="text-sm font-extrabold text-zinc-200 uppercase tracking-wider mb-4 flex items-center space-x-2">
-                    <i class="fa-solid fa-fire text-red-500"></i>
-                    <span>Popular Tracks</span>
-                </h2>
-                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4" id="songGrid"></div>
-            </div>
-        </div>
-
-        <div id="viewDownloads" class="hidden space-y-4">
-            <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
-                <h2 class="text-sm font-extrabold text-zinc-200 uppercase tracking-wider flex items-center space-x-2">
-                    <i class="fa-solid fa-circle-down text-green-500"></i>
-                    <span>Downloaded Music</span>
-                </h2>
-                <span id="downloadCount" class="text-xs text-zinc-400">0 songs saved</span>
-            </div>
-            <div id="downloadedList" class="space-y-2"></div>
-        </div>
-    </div>
-
-    <!-- Bottom Player -->
-    <div class="fixed bottom-0 left-0 right-0 glass-panel border-t border-zinc-800 p-3 z-40 flex items-center justify-between px-6">
-        <div class="flex items-center space-x-3 w-1/4">
-            <img id="playerCover" src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=150&q=80" class="w-12 h-12 rounded-lg object-cover border border-zinc-800">
-            <div class="truncate">
-                <h4 id="playerTitle" class="text-xs font-bold text-white truncate">Select a song</h4>
-                <p id="playerArtist" class="text-[11px] text-zinc-400 truncate">BeatStream Player</p>
-            </div>
-            <button onclick="downloadCurrentSong()" title="Download Track" class="text-zinc-400 hover:text-green-500 text-xs p-1">
-                <i class="fa-solid fa-download"></i>
-            </button>
-        </div>
-
-        <div class="flex flex-col items-center space-y-1 w-2/4 max-w-md">
-            <div class="flex items-center space-x-6 text-zinc-300">
-                <button onclick="togglePlayPause()" id="btnPlay" class="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition">
-                    <i class="fa-solid fa-play text-xs pl-0.5"></i>
-                </button>
-            </div>
-            <div class="w-full flex items-center space-x-2 text-[10px] font-mono text-zinc-400">
-                <span id="currTime">0:00</span>
-                <input type="range" id="seekSlider" value="0" min="0" max="100" oninput="seekTrack(this.value)" class="w-full h-1 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-green-500">
-                <span id="totalTime">0:00</span>
-            </div>
-        </div>
-        <div class="w-1/4"></div>
-    </div>
-
-    <!-- Payment Modal (With Explicit UPI ID Display) -->
-    <div id="paymentModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <!-- Payment Modal -->
+    <div id="payModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
         <div class="bg-zinc-900 border border-zinc-800 rounded-3xl max-w-sm w-full p-6 text-center space-y-5 shadow-2xl">
             <div class="space-y-1">
-                <div class="inline-flex items-center space-x-1 text-yellow-500 bg-yellow-500/10 px-3 py-1 rounded-full text-xs font-bold border border-yellow-500/20">
-                    <i class="fa-solid fa-crown text-[10px]"></i>
-                    <span>BeatStream Premium Pass</span>
+                <div class="inline-flex items-center space-x-1 text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-full text-xs font-bold border border-indigo-500/20">
+                    <i class="fa-solid fa-lock text-[10px]"></i>
+                    <span>Unlock 4K Ultra-HD Original</span>
                 </div>
-                <h3 class="text-xl font-bold text-white pt-2">Activate for ₹10</h3>
-                <p class="text-xs text-zinc-400">Valid for 30 Days • Offline Downloads • Zero Ads</p>
+                <h3 id="modalWallTitle" class="text-xl font-bold text-white pt-2">4K Wallpaper</h3>
+                <p class="text-xs text-zinc-400">Pay ₹10 once to download unwatermarked 4K image</p>
             </div>
 
             <!-- UPI Payment Details -->
             <div class="bg-zinc-950 p-4 rounded-2xl border border-zinc-800 space-y-3 flex flex-col items-center">
                 <img id="upiQrImg" src="" alt="UPI QR" class="w-40 h-40 bg-white p-2 rounded-xl">
                 
-                <!-- Displayed UPI ID Text -->
                 <div class="w-full bg-zinc-900 p-2.5 rounded-xl border border-zinc-800 text-center">
                     <span class="text-[10px] text-zinc-400 uppercase tracking-widest block mb-0.5">UPI ID</span>
-                    <strong class="text-xs text-green-400 font-mono select-all">9431920376@fam</strong>
+                    <strong class="text-xs text-indigo-400 font-mono select-all">9431920376@fam</strong>
                 </div>
 
-                <a id="upiPayBtn" href="#" class="w-full bg-green-500 hover:bg-green-400 text-black font-extrabold text-xs py-2.5 rounded-xl transition flex items-center justify-center space-x-2">
+                <a id="upiPayBtn" href="#" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-extrabold text-xs py-2.5 rounded-xl transition flex items-center justify-center space-x-2">
                     <i class="fa-solid fa-mobile-screen"></i>
                     <span>Pay ₹10 via UPI App</span>
                 </a>
             </div>
 
-            <!-- UTR Form -->
+            <!-- UTR Verification Input -->
             <div class="space-y-2 text-left">
-                <label class="text-[11px] text-zinc-400 font-semibold block">Enter 12-Digit UTR / Ref Number</label>
-                <input type="text" id="utrInput" maxlength="12" placeholder="e.g. 409812345678" class="w-full bg-zinc-950 border border-zinc-800 text-xs text-white p-3 rounded-xl focus:outline-none focus:border-green-500 font-mono">
-                <button onclick="verifyAndActivate()" class="w-full bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs py-3 rounded-xl transition border border-zinc-700">Verify Transaction</button>
+                <label class="text-[11px] text-zinc-400 font-semibold block">Enter 12-Digit UTR / Transaction ID</label>
+                <input type="text" id="utrInput" maxlength="12" placeholder="e.g. 409812345678" class="w-full bg-zinc-950 border border-zinc-800 text-xs text-white p-3 rounded-xl focus:outline-none focus:border-indigo-500 font-mono">
+                <button onclick="verifyAndUnlock()" class="w-full bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs py-3 rounded-xl transition border border-zinc-700">Verify & Download 4K</button>
             </div>
 
-            <button onclick="closePaymentModal()" class="text-xs text-zinc-500 hover:text-white">Cancel</button>
+            <button onclick="closePayModal()" class="text-xs text-zinc-500 hover:text-white">Cancel</button>
         </div>
     </div>
 
-    <div id="youtubePlayerContainer" class="hidden"></div>
-    <script src="https://www.youtube.com/iframe_api"></script>
-
     <script>
         const UPI_ID = "9431920376@fam";
-        let currentUser = localStorage.getItem('beatstream_phone');
-        let ytPlayer = null;
-        let isPlaying = false;
-        let currentTrackIndex = 0;
+        let activeWallId = null;
+        let currentCategory = 'all';
+        let currentFormat = 'all';
 
-        const playlist = [
-            { id: "kJQP7kiw5Fk", title: "Despacito", artist: "Luis Fonsi ft. Daddy Yankee", cover: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=300&q=80" },
-            { id: "JGwWNGJdvx8", title: "Shape of You", artist: "Ed Sheeran", cover: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=300&q=80" },
-            { id: "OPf0YbXqDm0", title: "Uptown Funk", artist: "Mark Ronson ft. Bruno Mars", cover: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=300&q=80" }
+        // Sample Catalog (Supercars, Aesthetics, Gaming, Anime for Boys & Girls in Phone/PC formats)
+        const wallpapers = [
+            { id: 1, title: "BMW M4 Competition Dark", category: "boys", format: "pc", price: 10, img: "https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1200&q=80" },
+            { id: 2, title: "Neon Cyberpunk Girl", category: "girls", format: "phone", price: 10, img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80" },
+            { id: 3, title: "BMW M5 Supercar Night", category: "boys", format: "phone", price: 10, img: "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=800&q=80" },
+            { id: 4, title: "Minimalist Pastel Clouds", category: "girls", format: "pc", price: 10, img: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=80" },
+            { id: 5, title: "Cyberpunk Gaming Rig", category: "boys", format: "pc", price: 10, img: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80" },
+            { id: 6, title: "Aesthetic Anime Sunset", category: "girls", format: "phone", price: 10, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80" }
         ];
 
-        function initApp() {
-            if (!currentUser) {
-                document.getElementById('loginScreen').classList.remove('hidden');
-                return;
-            }
-            document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('navPhone').innerText = `+91 ${currentUser}`;
-            
-            checkSubscription();
-            setupUPI();
-            renderSongGrid(playlist);
+        function isUnlocked(id) {
+            return localStorage.getItem(`unlocked_wall_${id}`) === 'true';
         }
 
-        function checkSubscription() {
-            const expiry = localStorage.getItem(`sub_expiry_${currentUser}`);
-            const now = new Date().getTime();
-            const isPremium = expiry && (now < parseInt(expiry));
+        function renderGallery() {
+            const grid = document.getElementById('wallpaperGrid');
+            const filtered = wallpapers.filter(w => {
+                const matchCat = currentCategory === 'all' || w.category === currentCategory;
+                const matchFmt = currentFormat === 'all' || w.format === currentFormat;
+                return matchCat && matchFmt;
+            });
 
-            document.getElementById('adBanner').classList.toggle('hidden', isPremium);
-            document.getElementById('badgeDot').className = isPremium ? "w-2 h-2 rounded-full bg-green-500" : "w-2 h-2 rounded-full bg-zinc-500";
-            document.getElementById('badgeText').innerText = isPremium ? "Premium Pass" : "Free Tier";
-            document.getElementById('badgeText').className = isPremium ? "text-green-400 font-bold" : "text-zinc-400";
-            document.getElementById('premiumUpgradeBtn').innerText = isPremium ? "Pass Active" : "Get Premium ₹10";
+            grid.innerHTML = filtered.map(w => {
+                const unlocked = isUnlocked(w.id);
+                return `
+                    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden group flex flex-col justify-between">
+                        <div class="relative ${w.format === 'phone' ? 'aspect-[9/16]' : 'aspect-video'} bg-zinc-950 overflow-hidden">
+                            <img src="${w.img}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            
+                            <!-- Watermark Overlay if locked -->
+                            ${!unlocked ? `
+                                <div class="absolute inset-0 watermark-overlay flex flex-col items-center justify-center p-4 text-center">
+                                    <span class="bg-black/70 backdrop-blur-md text-white font-extrabold text-[10px] px-3 py-1 rounded-full border border-white/20 uppercase tracking-widest mb-1">
+                                        <i class="fa-solid fa-lock mr-1"></i> Preview Only
+                                    </span>
+                                </div>
+                            ` : `
+                                <div class="absolute top-3 right-3 bg-indigo-600 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full shadow-lg">
+                                    <i class="fa-solid fa-circle-check mr-1"></i> Unlocked
+                                </div>
+                            `}
+                        </div>
 
-            return isPremium;
+                        <div class="p-4 space-y-3">
+                            <div class="flex items-start justify-between gap-2">
+                                <div>
+                                    <h3 class="text-xs font-bold text-white">${w.title}</h3>
+                                    <span class="text-[10px] text-zinc-500 uppercase font-mono tracking-wider">${w.category} • ${w.format.toUpperCase()}</span>
+                                </div>
+                                <span class="text-xs font-black text-indigo-400">₹10</span>
+                            </div>
+
+                            ${unlocked ? `
+                                <a href="${w.img}" download="${w.title}-4K.jpg" target="_blank" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-2.5 rounded-xl transition flex items-center justify-center space-x-2">
+                                    <i class="fa-solid fa-download"></i>
+                                    <span>Download 4K Image</span>
+                                </a>
+                            ` : `
+                                <button onclick="openPayModal(${w.id})" class="w-full bg-zinc-800 hover:bg-indigo-600 text-white font-bold text-xs py-2.5 rounded-xl transition border border-zinc-700 flex items-center justify-center space-x-2">
+                                    <i class="fa-solid fa-unlock"></i>
+                                    <span>Unlock 4K for ₹10</span>
+                                </button>
+                            `}
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
-        function setupUPI() {
-            const upiUri = `upi://pay?pa=${UPI_ID}&pn=BeatStream&am=10&cu=INR`;
+        function filterCategory(cat) {
+            currentCategory = cat;
+            document.querySelectorAll('[id^="cat"]').forEach(btn => btn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800 transition');
+            document.getElementById(`cat${cat.charAt(0).toUpperCase() + cat.slice(1)}`).className = 'px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white transition';
+            renderGallery();
+        }
+
+        function filterFormat(fmt) {
+            currentFormat = fmt;
+            document.querySelectorAll('[id^="fmt"]').forEach(btn => btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-400 hover:text-white');
+            document.getElementById(`fmt${fmt.charAt(0).toUpperCase() + fmt.slice(1)}`).className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-zinc-800 text-white';
+            renderGallery();
+        }
+
+        function openPayModal(id) {
+            activeWallId = id;
+            const wall = wallpapers.find(w => w.id === id);
+            document.getElementById('modalWallTitle').innerText = wall.title;
+
+            const upiUri = `upi://pay?pa=${UPI_ID}&pn=WallPaperVault&am=10&cu=INR`;
             document.getElementById('upiPayBtn').href = upiUri;
             document.getElementById('upiQrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiUri)}`;
+
+            document.getElementById('payModal').classList.remove('hidden');
         }
 
-        function verifyAndActivate() {
+        function closePayModal() {
+            document.getElementById('payModal').classList.add('hidden');
+            document.getElementById('utrInput').value = '';
+        }
+
+        function verifyAndUnlock() {
             const utr = document.getElementById('utrInput').value.trim();
             if (utr.length === 12 && !isNaN(utr)) {
-                const expirationTime = new Date().getTime() + (30 * 24 * 60 * 60 * 1000);
-                localStorage.setItem(`sub_expiry_${currentUser}`, expirationTime);
-                closePaymentModal();
-                checkSubscription();
-                alert("🎉 Premium Pass Activated for 30 Days!");
+                localStorage.setItem(`unlocked_wall_${activeWallId}`, 'true');
+                closePayModal();
+                renderGallery();
+                alert("🎉 Payment Verified! 4K Wallpaper Unlocked!");
             } else {
-                alert("Please enter a valid 12-digit UTR/Ref number.");
+                alert("Please enter a valid 12-digit UTR/Transaction ID.");
             }
         }
 
-        function downloadCurrentSong() {
-            if (!checkSubscription()) {
-                openPaymentModal();
-            } else {
-                alert("Downloading song for offline listening...");
-            }
-        }
-
-        function openPaymentModal() { document.getElementById('paymentModal').classList.remove('hidden'); }
-        function closePaymentModal() { document.getElementById('paymentModal').classList.add('hidden'); }
-
-        function loginUser() {
-            const phone = document.getElementById('userPhone').value.trim();
-            if (phone.length === 10 && !isNaN(phone)) {
-                localStorage.setItem('beatstream_phone', phone);
-                currentUser = phone;
-                initApp();
-            }
-        }
-
-        function logoutUser() {
-            localStorage.removeItem('beatstream_phone');
-            location.reload();
-        }
-
-        function renderSongGrid(songs) {
-            document.getElementById('songGrid').innerHTML = songs.map((s, idx) => `
-                <div class="bg-zinc-900/60 border border-zinc-800/80 p-3 rounded-2xl group cursor-pointer" onclick="playTrack(${idx})">
-                    <img src="${s.cover}" class="w-full aspect-square object-cover rounded-xl mb-2">
-                    <h3 class="text-xs font-bold text-white truncate">${s.title}</h3>
-                    <p class="text-[10px] text-zinc-400 truncate">${s.artist}</p>
-                </div>
-            `).join('');
-        }
-
-        function switchTab(tab) {
-            document.getElementById('viewHome').classList.toggle('hidden', tab !== 'home');
-            document.getElementById('viewDownloads').classList.toggle('hidden', tab !== 'downloads');
-        }
-
-        initApp();
+        renderGallery();
     </script>
 </body>
 </html>
