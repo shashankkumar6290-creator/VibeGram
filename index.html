@@ -82,8 +82,8 @@
 
             <!-- UTR Verification Input -->
             <div class="space-y-2 text-left">
-                <label class="text-[11px] text-zinc-400 font-semibold block">Enter 12-Digit UTR / Transaction ID</label>
-                <input type="text" id="utrInput" maxlength="12" placeholder="e.g. 409812345678" class="w-full bg-zinc-950 border border-zinc-800 text-xs text-white p-3 rounded-xl focus:outline-none focus:border-indigo-500 font-mono">
+                <label class="text-[11px] text-zinc-400 font-semibold block">Enter 12-Character UTR / Transaction ID</label>
+                <input type="text" id="utrInput" maxlength="12" placeholder="e.g. 409812345678 or UPI1234ABCD5" class="w-full bg-zinc-950 border border-zinc-800 text-xs text-white p-3 rounded-xl focus:outline-none focus:border-indigo-500 font-mono uppercase">
                 <button onclick="verifyAndUnlock()" class="w-full bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs py-3 rounded-xl transition border border-zinc-700">Verify & Download 4K</button>
             </div>
 
@@ -97,17 +97,14 @@
         let currentCategory = 'all';
         let currentFormat = 'all';
 
-        // Expanded Catalog (16 Wallpapers for Boys & Girls in Phone/PC formats)
+        // Catalog (16 Wallpapers for Boys & Girls in Phone/PC formats)
         const wallpapers = [
-            // Original 6
             { id: 1, title: "BMW M4 Competition Dark", category: "boys", format: "pc", price: 10, img: "https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1200&q=80" },
             { id: 2, title: "Neon Cyberpunk Girl", category: "girls", format: "phone", price: 10, img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80" },
             { id: 3, title: "BMW M5 Supercar Night", category: "boys", format: "phone", price: 10, img: "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=800&q=80" },
             { id: 4, title: "Minimalist Pastel Clouds", category: "girls", format: "pc", price: 10, img: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=80" },
             { id: 5, title: "Cyberpunk Gaming Rig", category: "boys", format: "pc", price: 10, img: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80" },
             { id: 6, title: "Aesthetic Anime Sunset", category: "girls", format: "phone", price: 10, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80" },
-
-            // 10 Newly Added Wallpapers
             { id: 7, title: "BMW M5 CS Green Beast", category: "boys", format: "phone", price: 10, img: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?auto=format&fit=crop&w=800&q=80" },
             { id: 8, title: "Soft Pastel Cloudscape", category: "girls", format: "phone", price: 10, img: "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80" },
             { id: 9, title: "BMW M4 Drift Smoke 4K", category: "boys", format: "pc", price: 10, img: "https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?auto=format&fit=crop&w=1200&q=80" },
@@ -211,14 +208,18 @@
         }
 
         function verifyAndUnlock() {
-            const utr = document.getElementById('utrInput').value.trim();
-            if (utr.length === 12 && !isNaN(utr)) {
+            const utr = document.getElementById('utrInput').value.trim().toUpperCase();
+            
+            // Checks for exactly 12 alphanumeric characters (letters A-Z and digits 0-9)
+            const isAlphanumeric12 = /^[A-Z0-9]{12}$/.test(utr);
+
+            if (isAlphanumeric12) {
                 localStorage.setItem(`unlocked_wall_${activeWallId}`, 'true');
                 closePayModal();
                 renderGallery();
                 alert("🎉 Payment Verified! 4K Wallpaper Unlocked!");
             } else {
-                alert("Please enter a valid 12-digit UTR/Transaction ID.");
+                alert("Please enter a valid 12-character UTR/Transaction ID (numbers & letters allowed).");
             }
         }
 
