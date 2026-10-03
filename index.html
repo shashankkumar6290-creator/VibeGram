@@ -37,7 +37,7 @@
             <span id="navPhoneMobile" class="text-[11px] text-zinc-400 sm:hidden font-mono"></span>
         </div>
 
-        <!-- Real-time Search Input Bar -->
+        <!-- Search Input Bar -->
         <div class="w-full sm:max-w-md relative">
             <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Search movies by title..." class="w-full bg-zinc-950 border border-zinc-800 text-xs text-white px-4 py-2 rounded-full focus:outline-none focus:border-red-600 transition pl-9">
             <svg class="w-4 h-4 text-zinc-500 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -53,7 +53,7 @@
         </div>
     </nav>
 
-    <!-- Search Results Display Area -->
+    <!-- Search Results Area -->
     <div id="searchResultsContainer" class="px-6 mt-6 hidden">
         <div class="flex items-center justify-between mb-3">
             <h2 class="text-sm font-bold text-zinc-200 uppercase tracking-wider flex items-center gap-2">
@@ -65,7 +65,7 @@
         <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4" id="searchResultsList"></div>
     </div>
 
-    <!-- Main Catalog Container (Featured Hero & Categories) -->
+    <!-- Main Catalog Container -->
     <div id="mainCatalog">
         <!-- Hero Banner -->
         <div class="relative w-full h-[380px] bg-cover bg-center flex items-end p-6" style="background-image: linear-gradient(to top, rgba(9,9,11,1), rgba(9,9,11,0.3)), url('https://image.tmdb.org/t/p/original/8Y43POKjjKDGI9A79uM3R1M33sI.jpg');">
@@ -79,21 +79,19 @@
             </div>
         </div>
 
-        <!-- Movie Catalog Section -->
+        <!-- Movie Rows -->
         <div class="px-6 mt-6 space-y-8">
-            <!-- Hindi / Indian Movies Row -->
             <div>
                 <div class="flex items-center justify-between mb-3">
                     <h2 class="text-sm font-bold text-zinc-200 uppercase tracking-wider flex items-center gap-2">
                         <span class="w-2 h-2 bg-red-600 rounded-full"></span>
                         Popular Hindi & Indian Cinema
                     </h2>
-                    <span class="text-[10px] text-zinc-500">Full Movies Available</span>
+                    <span class="text-[10px] text-zinc-500">Full Streams</span>
                 </div>
                 <div class="flex space-x-4 overflow-x-auto no-scrollbar pb-2" id="hindiMovieList"></div>
             </div>
 
-            <!-- Global Trending Movies Row -->
             <div>
                 <div class="flex items-center justify-between mb-3">
                     <h2 class="text-sm font-bold text-zinc-200 uppercase tracking-wider flex items-center gap-2">
@@ -119,19 +117,12 @@
             </div>
             
             <div class="aspect-video w-full bg-black relative flex items-center justify-center">
-                <!-- Native Player for MP4 Streams -->
-                <video id="nativeVideoPlayer" class="w-full h-full hidden" controls autoplay controlsList="nodownload">
-                    <source id="videoSource" src="" type="video/mp4">
-                    Your browser does not support HTML5 video streaming.
-                </video>
-
-                <!-- Iframe Player for Web Embed Sources -->
-                <iframe id="videoIframe" class="w-full h-full hidden" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                <iframe id="videoIframe" class="w-full h-full" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
             </div>
         </div>
     </div>
 
-    <!-- UPI Payment Gateway Modal -->
+    <!-- UPI Payment Modal -->
     <div id="paymentModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
         <div class="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl">
             <div>
@@ -139,7 +130,6 @@
                 <p class="text-xs text-zinc-400">Unlimited movie access for 30 days at <strong>₹10</strong></p>
             </div>
 
-            <!-- Live QR Code & Direct Deep Link -->
             <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 space-y-3 flex flex-col items-center">
                 <div class="bg-white p-2 rounded-lg border border-zinc-700 shadow-md">
                     <img id="upiQrImg" src="" alt="Scan QR Code to Pay" class="w-36 h-36">
@@ -153,7 +143,6 @@
                 <p class="text-[10px] text-zinc-500 font-mono">UPI ID: 9431920376@fam</p>
             </div>
 
-            <!-- Verification Step -->
             <div class="space-y-2 text-left">
                 <label class="text-[11px] text-zinc-400 font-semibold block">Enter 12-Digit UTR / Transaction ID:</label>
                 <input type="text" id="utrInput" maxlength="12" placeholder="e.g. 409812345678" class="w-full bg-zinc-950 border border-zinc-800 text-xs text-white p-2.5 rounded-lg focus:outline-none focus:border-red-600 font-mono">
@@ -170,34 +159,30 @@
         const AMOUNT = "10";
         let currentUser = localStorage.getItem('cinevault_phone');
 
-        // Combined Master Database for movies and real-time search engine
+        // Reliable iframe embed URLs (prevents CORS loading issues)
         const fallbackHindiMovies = [
             { 
-                title: "Jawan (Full Movie)", 
+                title: "Jawan", 
                 poster: "https://image.tmdb.org/t/p/w500/m13Mbhq1s34PFF4eP9OqL9oA06G.jpg", 
-                streamUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
-                type: "native",
+                streamUrl: "https://www.youtube-nocookie.com/embed/COv52Qyctws?autoplay=1",
                 lang: "HINDI"
             },
             { 
-                title: "Animal (Full Movie)", 
+                title: "Animal", 
                 poster: "https://image.tmdb.org/t/p/w500/hr9A1R3P2ijP39hKfC2943oI9R0.jpg", 
-                streamUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
-                type: "native",
+                streamUrl: "https://www.youtube-nocookie.com/embed/Dydmpej6adI?autoplay=1",
                 lang: "HINDI"
             },
             { 
-                title: "Pathaan (Full Movie)", 
+                title: "Pathaan", 
                 poster: "https://image.tmdb.org/t/p/w500/3P73gE0K5pD3Ue8mP4z11a9O0.jpg", 
-                streamUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
-                type: "native",
+                streamUrl: "https://www.youtube-nocookie.com/embed/vqu4z34wENw?autoplay=1",
                 lang: "HINDI"
             },
             { 
-                title: "Dunki (Full Movie)", 
+                title: "Dunki", 
                 poster: "https://image.tmdb.org/t/p/w500/3o6Gf1qP19q5s1y1P0.jpg", 
-                streamUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
-                type: "native",
+                streamUrl: "https://www.youtube-nocookie.com/embed/Xq-45iP07iI?autoplay=1",
                 lang: "HINDI"
             }
         ];
@@ -206,22 +191,19 @@
             { 
                 title: "Spider-Man: Across the Spider-Verse", 
                 poster: "https://image.tmdb.org/t/p/w500/8Vt6mWEReuy4Of61Lnj5Xj7sR18.jpg", 
-                streamUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
-                type: "native",
+                streamUrl: "https://www.youtube-nocookie.com/embed/cqGjhVJWtEg?autoplay=1",
                 lang: "ENGLISH"
             },
             { 
                 title: "Dune: Part Two", 
                 poster: "https://image.tmdb.org/t/p/w500/1pdfLvkbY9ohJlRjA2CZS9ivRTo.jpg", 
-                streamUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-                type: "native",
+                streamUrl: "https://www.youtube-nocookie.com/embed/Way9Dexny3w?autoplay=1",
                 lang: "ENGLISH"
             },
             { 
                 title: "Oppenheimer", 
                 poster: "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGvRzR1n2ua.jpg", 
-                streamUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreet.mp4",
-                type: "native",
+                streamUrl: "https://www.youtube-nocookie.com/embed/uYPbbksJxIg?autoplay=1",
                 lang: "ENGLISH"
             }
         ];
@@ -252,7 +234,7 @@
         function renderList(items, targetContainerId, langLabel) {
             const list = document.getElementById(targetContainerId);
             list.innerHTML = items.map(m => `
-                <div class="flex-none w-36 cursor-pointer group" onclick="handleMovieClick('${m.title.replace(/'/g, "")}', '${m.streamUrl}', '${m.type}')">
+                <div class="flex-none w-36 cursor-pointer group" onclick="handleMovieClick('${m.title.replace(/'/g, "")}', '${m.streamUrl}')">
                     <div class="relative aspect-[2/3] rounded-lg overflow-hidden bg-zinc-800 border border-zinc-800 group-hover:border-red-600 transition">
                         <img src="${m.poster}" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=400&q=80'">
                         <span class="absolute top-2 left-2 bg-black/80 backdrop-blur-sm text-[9px] font-extrabold px-1.5 py-0.5 rounded text-zinc-300 border border-zinc-700/50">${m.lang || langLabel}</span>
@@ -283,9 +265,9 @@
                 resultsList.innerHTML = `<p class="col-span-full text-xs text-zinc-500 py-8 text-center">No movies found matching "${query}"</p>`;
             } else {
                 resultsList.innerHTML = matches.map(m => `
-                    <div class="cursor-pointer group" onclick="handleMovieClick('${m.title.replace(/'/g, "")}', '${m.streamUrl}', '${m.type}')">
+                    <div class="cursor-pointer group" onclick="handleMovieClick('${m.title.replace(/'/g, "")}', '${m.streamUrl}')">
                         <div class="relative aspect-[2/3] rounded-lg overflow-hidden bg-zinc-800 border border-zinc-800 group-hover:border-red-600 transition">
-                            <img src="${m.poster}" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=400&q=80'">
+                            <img src="${m.poster}" class="w-full h-full object-cover">
                             <span class="absolute top-2 left-2 bg-black/80 backdrop-blur-sm text-[9px] font-extrabold px-1.5 py-0.5 rounded text-zinc-300 border border-zinc-700/50">${m.lang}</span>
                         </div>
                         <p class="text-xs font-semibold mt-1.5 truncate">${m.title}</p>
@@ -329,43 +311,19 @@
             }
         }
 
-        function handleMovieClick(title, streamUrl, type) {
+        function handleMovieClick(title, streamUrl) {
             const isActive = checkSubscription();
             if (!isActive) {
                 openPaymentModal();
             } else {
                 document.getElementById('playerTitle').innerText = title;
-                const nativePlayer = document.getElementById('nativeVideoPlayer');
-                const iframePlayer = document.getElementById('videoIframe');
-
-                if (type === 'native') {
-                    iframePlayer.classList.add('hidden');
-                    iframePlayer.src = '';
-                    
-                    document.getElementById('videoSource').src = streamUrl;
-                    nativePlayer.load();
-                    nativePlayer.classList.remove('hidden');
-                } else {
-                    nativePlayer.classList.add('hidden');
-                    nativePlayer.pause();
-                    
-                    iframePlayer.src = streamUrl;
-                    iframePlayer.classList.remove('hidden');
-                }
-
+                document.getElementById('videoIframe').src = streamUrl;
                 document.getElementById('playerModal').classList.remove('hidden');
             }
         }
 
         function closePlayer() {
-            const nativePlayer = document.getElementById('nativeVideoPlayer');
-            const iframePlayer = document.getElementById('videoIframe');
-            
-            nativePlayer.pause();
-            nativePlayer.classList.add('hidden');
-            iframePlayer.src = "";
-            iframePlayer.classList.add('hidden');
-            
+            document.getElementById('videoIframe').src = "";
             document.getElementById('playerModal').classList.add('hidden');
         }
 
