@@ -139,10 +139,21 @@
         const AMOUNT = "10";
         let currentUser = localStorage.getItem('cinevault_phone');
 
-        // TMDB Config
-        const TMDB_KEY = "842270b28805e4e2ae2804b321a520a0"; 
-        const HINDI_API = `https://api.themoviedb.org/3/discover/movie?api_key=${TMDB_KEY}&with_original_language=hi&sort_by=popularity.desc`;
-        const GLOBAL_API = `https://api.themoviedb.org/3/trending/movie/week?api_key=${TMDB_KEY}`;
+        // Fallback movie catalogs to guarantee immediate display on Vercel/GitHub
+        const fallbackHindiMovies = [
+            { title: "Jawan", poster: "https://image.tmdb.org/t/p/w500/m13Mbhq1s34PFF4eP9OqL9oA06G.jpg", id: "852448" },
+            { title: "Animal", poster: "https://image.tmdb.org/t/p/w500/hr9A1R3P2ijP39hKfC2943oI9R0.jpg", id: "781732" },
+            { title: "Pathaan", poster: "https://image.tmdb.org/t/p/w500/3P73gE0K5pD3Ue8mP4z11a9O0.jpg", id: "868759" },
+            { title: "Dunki", poster: "https://image.tmdb.org/t/p/w500/3o6Gf1qP19q5s1y1P0.jpg", id: "983212" },
+            { title: "Leo", poster: "https://image.tmdb.org/t/p/w500/p33mS1G1P5s0s1y1P0.jpg", id: "912908" }
+        ];
+
+        const fallbackGlobalMovies = [
+            { title: "Dune: Part Two", poster: "https://image.tmdb.org/t/p/w500/1pdfLvkbY9ohJlRjA2CZS9ivRTo.jpg", id: "693134" },
+            { title: "Oppenheimer", poster: "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGvRzR1n2ua.jpg", id: "872585" },
+            { title: "Avatar: The Way of Water", poster: "https://image.tmdb.org/t/p/w500/t6HIfvMGnvRXiL1A9K38P3AUtB.jpg", id: "76600" },
+            { title: "Spider-Man: Across the Spider-Verse", poster: "https://image.tmdb.org/t/p/w500/8Vt6mWEReuy4Of61Lnj5Xj7sR18.jpg", id: "569094" }
+        ];
 
         function initApp() {
             if (!currentUser) {
@@ -154,15 +165,45 @@
             document.getElementById('navPhone').innerText = `+91 ${currentUser}`;
             checkSubscription();
             
-            // Build Dynamic UPI Links & QR Code
             const upiUri = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${AMOUNT}&cu=INR&tn=CineVault30DaysPass`;
             const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiUri)}`;
             
             document.getElementById('upiPayBtn').href = upiUri;
             document.getElementById('upiQrImg').src = qrApiUrl;
 
-            loadMovies(HINDI_API, 'hindiMovieList', 'HINDI');
-            loadMovies(GLOBAL_API, 'globalMovieList', 'ENGLISH');
+            loadMovies(`https://api.themoviedb.org/3/discover/movie?api_key=842270b28805e4e2ae2804b321a520a0&with_original_language=hi&sort_by=popularity.desc`, 'hindiMovieList', 'HINDI', fallbackHindiMovies);
+            loadMovies(`https://api.themoviedb.org/3/trending/movie/week?api_key=842270b28805e4e2ae2804b321a520a0`, 'globalMovieList', 'ENGLISH', fallbackGlobalMovies);
+        }
+
+        async function loadMovies(apiUrl, targetContainerId, langLabel, fallbackList) {
+            const list = document.getElementById(targetContainerId);
+            try {
+                const res = await fetch(apiUrl);
+                if(!res.ok) throw new Error("API network issue");
+                const data = await res.json();
+                renderList(data.results, targetContainerId, langLabel);
+            } catch(e) {
+                renderList(fallbackList, targetContainerId, langLabel);
+            }
+        }
+
+        function renderList(items, targetContainerId, langLabel) {
+            const list = document.getElementById(targetContainerId);
+            list.innerHTML = items.map(m => {
+                const title = (m.title || m.name || "").replace(/'/g, "");
+                const poster = m.poster_path ? `https://image.tmdb.org/t/p/w500${m.poster_path}` : m.poster;
+                const embedUrl = `https://vidsrc.to/embed/movie/${m.id}`;
+                
+                return `
+                    <div class="flex-none w-36 cursor-pointer group" onclick="handleMovieClick('${title}', '${embedUrl}')">
+                        <div class="relative aspect-[2/3] rounded-lg overflow-hidden bg-zinc-800 border border-zinc-800 group-hover:border-red-600 transition">
+                            <img src="${poster}" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=400&q=80'">
+                            <span class="absolute top-2 left-2 bg-black/80 backdrop-blur-sm text-[9px] font-extrabold px-1.5 py-0.5 rounded text-zinc-300 border border-zinc-700/50">${langLabel}</span>
+                        </div>
+                        <p class="text-xs font-semibold mt-1.5 truncate">${title}</p>
+                    </div>
+                `;
+            }).join('');
         }
 
         function loginUser() {
@@ -192,32 +233,6 @@
                 subBtn.className = "bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2 rounded-full shadow-md";
                 subBtn.onclick = openPaymentModal;
                 return false;
-            }
-        }
-
-        async function loadMovies(apiUrl, targetContainerId, langLabel) {
-            const list = document.getElementById(targetContainerId);
-            try {
-                const res = await fetch(apiUrl);
-                const data = await res.json();
-                
-                list.innerHTML = data.results.map(m => {
-                    const title = (m.title || m.name || "").replace(/'/g, "");
-                    const poster = m.poster_path ? `https://image.tmdb.org/t/p/w500${m.poster_path}` : 'https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=400&q=80';
-                    const embedUrl = `https://vidsrc.to/embed/movie/${m.id}`;
-                    
-                    return `
-                        <div class="flex-none w-36 cursor-pointer group" onclick="handleMovieClick('${title}', '${embedUrl}')">
-                            <div class="relative aspect-[2/3] rounded-lg overflow-hidden bg-zinc-800 border border-zinc-800 group-hover:border-red-600 transition">
-                                <img src="${poster}" class="w-full h-full object-cover">
-                                <span class="absolute top-2 left-2 bg-black/80 backdrop-blur-sm text-[9px] font-extrabold px-1.5 py-0.5 rounded text-zinc-300 border border-zinc-700/50">${langLabel}</span>
-                            </div>
-                            <p class="text-xs font-semibold mt-1.5 truncate">${title}</p>
-                        </div>
-                    `;
-                }).join('');
-            } catch(e) {
-                list.innerHTML = `<p class="text-xs text-zinc-500">Failed to load media catalog.</p>`;
             }
         }
 
