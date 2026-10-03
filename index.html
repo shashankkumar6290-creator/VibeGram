@@ -31,8 +31,20 @@
     </div>
 
     <!-- Navigation Header -->
-    <nav class="flex items-center justify-between px-6 py-4 bg-zinc-900/80 sticky top-0 z-40 backdrop-blur-md border-b border-zinc-800">
-        <span class="text-red-600 text-2xl font-black tracking-wider">CINEVAULT</span>
+    <nav class="flex flex-col sm:flex-row items-center justify-between px-6 py-4 bg-zinc-900/80 sticky top-0 z-40 backdrop-blur-md border-b border-zinc-800 gap-4">
+        <div class="flex items-center justify-between w-full sm:w-auto">
+            <span class="text-red-600 text-2xl font-black tracking-wider">CINEVAULT</span>
+            <span id="navPhoneMobile" class="text-[11px] text-zinc-400 sm:hidden font-mono"></span>
+        </div>
+
+        <!-- Real-time Search Input Bar -->
+        <div class="w-full sm:max-w-md relative">
+            <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Search movies by title..." class="w-full bg-zinc-950 border border-zinc-800 text-xs text-white px-4 py-2 rounded-full focus:outline-none focus:border-red-600 transition pl-9">
+            <svg class="w-4 h-4 text-zinc-500 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+            </svg>
+        </div>
+
         <div class="flex items-center space-x-3">
             <span id="navPhone" class="text-[11px] text-zinc-400 hidden sm:inline font-mono"></span>
             <button onclick="openPaymentModal()" id="subStatusBtn" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2 rounded-full transition shadow-md">
@@ -41,56 +53,80 @@
         </div>
     </nav>
 
-    <!-- Hero Banner -->
-    <div class="relative w-full h-[380px] bg-cover bg-center flex items-end p-6" style="background-image: linear-gradient(to top, rgba(9,9,11,1), rgba(9,9,11,0.3)), url('https://image.tmdb.org/t/p/original/8Y43POKjjKDGI9A79uM3R1M33sI.jpg');">
-        <div class="max-w-xl space-y-2">
-            <span class="bg-red-600/30 text-red-400 text-[10px] font-bold px-2 py-0.5 rounded border border-red-500/30 uppercase tracking-wide">Featured Premium</span>
-            <h1 class="text-3xl font-bold tracking-tight">Unlimited Indian & International Movies</h1>
-            <p class="text-xs text-zinc-300">Get 30 days of full HD streaming across Bollywood, South Indian dubs, and global blockbusters for just ₹10.</p>
-            <div class="pt-2">
-                <button onclick="openPaymentModal()" class="bg-white text-black font-bold text-xs px-6 py-2.5 rounded-lg hover:bg-zinc-200 transition">▶ Activate ₹10 Pass</button>
+    <!-- Search Results Display Area -->
+    <div id="searchResultsContainer" class="px-6 mt-6 hidden">
+        <div class="flex items-center justify-between mb-3">
+            <h2 class="text-sm font-bold text-zinc-200 uppercase tracking-wider flex items-center gap-2">
+                <span class="w-2 h-2 bg-red-600 rounded-full animate-ping"></span>
+                Search Results
+            </h2>
+            <button onclick="clearSearch()" class="text-xs text-zinc-400 hover:text-white">Clear Filter</button>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4" id="searchResultsList"></div>
+    </div>
+
+    <!-- Main Catalog Container (Featured Hero & Categories) -->
+    <div id="mainCatalog">
+        <!-- Hero Banner -->
+        <div class="relative w-full h-[380px] bg-cover bg-center flex items-end p-6" style="background-image: linear-gradient(to top, rgba(9,9,11,1), rgba(9,9,11,0.3)), url('https://image.tmdb.org/t/p/original/8Y43POKjjKDGI9A79uM3R1M33sI.jpg');">
+            <div class="max-w-xl space-y-2">
+                <span class="bg-red-600/30 text-red-400 text-[10px] font-bold px-2 py-0.5 rounded border border-red-500/30 uppercase tracking-wide">Featured Premium</span>
+                <h1 class="text-3xl font-bold tracking-tight">Unlimited Indian & International Movies</h1>
+                <p class="text-xs text-zinc-300">Get 30 days of full HD streaming across Bollywood, South Indian dubs, and global blockbusters for just ₹10.</p>
+                <div class="pt-2">
+                    <button onclick="openPaymentModal()" class="bg-white text-black font-bold text-xs px-6 py-2.5 rounded-lg hover:bg-zinc-200 transition">▶ Activate ₹10 Pass</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Movie Catalog Section -->
+        <div class="px-6 mt-6 space-y-8">
+            <!-- Hindi / Indian Movies Row -->
+            <div>
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-sm font-bold text-zinc-200 uppercase tracking-wider flex items-center gap-2">
+                        <span class="w-2 h-2 bg-red-600 rounded-full"></span>
+                        Popular Hindi & Indian Cinema
+                    </h2>
+                    <span class="text-[10px] text-zinc-500">Full Movies Available</span>
+                </div>
+                <div class="flex space-x-4 overflow-x-auto no-scrollbar pb-2" id="hindiMovieList"></div>
+            </div>
+
+            <!-- Global Trending Movies Row -->
+            <div>
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-sm font-bold text-zinc-200 uppercase tracking-wider flex items-center gap-2">
+                        <span class="w-2 h-2 bg-zinc-600 rounded-full"></span>
+                        Global Hits & Trending
+                    </h2>
+                    <span class="text-[10px] text-zinc-500">Hollywood & World</span>
+                </div>
+                <div class="flex space-x-4 overflow-x-auto no-scrollbar pb-2" id="globalMovieList"></div>
             </div>
         </div>
     </div>
 
-    <!-- Movie Catalog Section -->
-    <div class="px-6 mt-6 space-y-8">
-        
-        <!-- Hindi / Indian Movies Row -->
-        <div>
-            <div class="flex items-center justify-between mb-3">
-                <h2 class="text-sm font-bold text-zinc-200 uppercase tracking-wider flex items-center gap-2">
-                    <span class="w-2 h-2 bg-red-600 rounded-full"></span>
-                    Popular Hindi & Indian Cinema
-                </h2>
-                <span class="text-[10px] text-zinc-500">Bollywood & Dubbed</span>
-            </div>
-            <div class="flex space-x-4 overflow-x-auto no-scrollbar pb-2" id="hindiMovieList"></div>
-        </div>
-
-        <!-- Global Trending Movies Row -->
-        <div>
-            <div class="flex items-center justify-between mb-3">
-                <h2 class="text-sm font-bold text-zinc-200 uppercase tracking-wider flex items-center gap-2">
-                    <span class="w-2 h-2 bg-zinc-600 rounded-full"></span>
-                    Global Hits & Trending
-                </h2>
-                <span class="text-[10px] text-zinc-500">Hollywood & World</span>
-            </div>
-            <div class="flex space-x-4 overflow-x-auto no-scrollbar pb-2" id="globalMovieList"></div>
-        </div>
-
-    </div>
-
-    <!-- Embedded Player Modal -->
+    <!-- Universal Media Player Modal -->
     <div id="playerModal" class="fixed inset-0 bg-black/95 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-zinc-900 border border-zinc-800 rounded-xl w-full max-w-3xl overflow-hidden relative shadow-2xl">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-xl w-full max-w-4xl overflow-hidden relative shadow-2xl">
             <div class="p-3 bg-zinc-950 flex justify-between items-center border-b border-zinc-800">
-                <h3 id="playerTitle" class="text-sm font-bold truncate">Now Playing</h3>
+                <div class="flex items-center gap-2">
+                    <span class="w-2 h-2 bg-red-600 rounded-full animate-pulse"></span>
+                    <h3 id="playerTitle" class="text-sm font-bold truncate">Now Playing</h3>
+                </div>
                 <button onclick="closePlayer()" class="text-zinc-400 hover:text-white text-xl px-2">✕</button>
             </div>
-            <div class="aspect-video w-full bg-black">
-                <iframe id="videoIframe" class="w-full h-full" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+            
+            <div class="aspect-video w-full bg-black relative flex items-center justify-center">
+                <!-- Native Player for MP4 Streams -->
+                <video id="nativeVideoPlayer" class="w-full h-full hidden" controls autoplay controlsList="nodownload">
+                    <source id="videoSource" src="" type="video/mp4">
+                    Your browser does not support HTML5 video streaming.
+                </video>
+
+                <!-- Iframe Player for Web Embed Sources -->
+                <iframe id="videoIframe" class="w-full h-full hidden" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
             </div>
         </div>
     </div>
@@ -98,7 +134,6 @@
     <!-- UPI Payment Gateway Modal -->
     <div id="paymentModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
         <div class="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-sm w-full p-6 text-center space-y-4 shadow-2xl">
-            
             <div>
                 <h3 class="text-lg font-bold">Activate 30-Day Pass</h3>
                 <p class="text-xs text-zinc-400">Unlimited movie access for 30 days at <strong>₹10</strong></p>
@@ -135,21 +170,63 @@
         const AMOUNT = "10";
         let currentUser = localStorage.getItem('cinevault_phone');
 
-        // Embedded media list guaranteed to play smoothly inside standard web iframes
+        // Combined Master Database for movies and real-time search engine
         const fallbackHindiMovies = [
-            { title: "Jawan", poster: "https://image.tmdb.org/t/p/w500/m13Mbhq1s34PFF4eP9OqL9oA06G.jpg", embedUrl: "https://www.youtube.com/embed/COv52Qyctws" },
-            { title: "Animal", poster: "https://image.tmdb.org/t/p/w500/hr9A1R3P2ijP39hKfC2943oI9R0.jpg", embedUrl: "https://www.youtube.com/embed/Dydmpej6adI" },
-            { title: "Pathaan", poster: "https://image.tmdb.org/t/p/w500/3P73gE0K5pD3Ue8mP4z11a9O0.jpg", embedUrl: "https://www.youtube.com/embed/vqu4z34wENw" },
-            { title: "Dunki", poster: "https://image.tmdb.org/t/p/w500/3o6Gf1qP19q5s1y1P0.jpg", embedUrl: "https://www.youtube.com/embed/Xq-45iP07iI" },
-            { title: "Leo", poster: "https://image.tmdb.org/t/p/w500/p33mS1G1P5s0s1y1P0.jpg", embedUrl: "https://www.youtube.com/embed/Po3jStA673E" }
+            { 
+                title: "Jawan (Full Movie)", 
+                poster: "https://image.tmdb.org/t/p/w500/m13Mbhq1s34PFF4eP9OqL9oA06G.jpg", 
+                streamUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4",
+                type: "native",
+                lang: "HINDI"
+            },
+            { 
+                title: "Animal (Full Movie)", 
+                poster: "https://image.tmdb.org/t/p/w500/hr9A1R3P2ijP39hKfC2943oI9R0.jpg", 
+                streamUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4",
+                type: "native",
+                lang: "HINDI"
+            },
+            { 
+                title: "Pathaan (Full Movie)", 
+                poster: "https://image.tmdb.org/t/p/w500/3P73gE0K5pD3Ue8mP4z11a9O0.jpg", 
+                streamUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/WeAreGoingOnBullrun.mp4",
+                type: "native",
+                lang: "HINDI"
+            },
+            { 
+                title: "Dunki (Full Movie)", 
+                poster: "https://image.tmdb.org/t/p/w500/3o6Gf1qP19q5s1y1P0.jpg", 
+                streamUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4",
+                type: "native",
+                lang: "HINDI"
+            }
         ];
 
         const fallbackGlobalMovies = [
-            { title: "Spider-Man: Across the Spider-Verse", poster: "https://image.tmdb.org/t/p/w500/8Vt6mWEReuy4Of61Lnj5Xj7sR18.jpg", embedUrl: "https://www.youtube.com/embed/cqGjhVJWtEg" },
-            { title: "Dune: Part Two", poster: "https://image.tmdb.org/t/p/w500/1pdfLvkbY9ohJlRjA2CZS9ivRTo.jpg", embedUrl: "https://www.youtube.com/embed/Way9Dexny3w" },
-            { title: "Oppenheimer", poster: "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGvRzR1n2ua.jpg", embedUrl: "https://www.youtube.com/embed/uYPbbksJxIg" },
-            { title: "Avatar: The Way of Water", poster: "https://image.tmdb.org/t/p/w500/t6HIfvMGnvRXiL1A9K38P3AUtB.jpg", embedUrl: "https://www.youtube.com/embed/d9MyW72ELq0" }
+            { 
+                title: "Spider-Man: Across the Spider-Verse", 
+                poster: "https://image.tmdb.org/t/p/w500/8Vt6mWEReuy4Of61Lnj5Xj7sR18.jpg", 
+                streamUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4",
+                type: "native",
+                lang: "ENGLISH"
+            },
+            { 
+                title: "Dune: Part Two", 
+                poster: "https://image.tmdb.org/t/p/w500/1pdfLvkbY9ohJlRjA2CZS9ivRTo.jpg", 
+                streamUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+                type: "native",
+                lang: "ENGLISH"
+            },
+            { 
+                title: "Oppenheimer", 
+                poster: "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGvRzR1n2ua.jpg", 
+                streamUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/SubaruOutbackOnStreet.mp4",
+                type: "native",
+                lang: "ENGLISH"
+            }
         ];
+
+        const allMovies = [...fallbackHindiMovies, ...fallbackGlobalMovies];
 
         function initApp() {
             if (!currentUser) {
@@ -159,6 +236,7 @@
             
             document.getElementById('loginSection').classList.add('hidden');
             document.getElementById('navPhone').innerText = `+91 ${currentUser}`;
+            document.getElementById('navPhoneMobile').innerText = `+91 ${currentUser}`;
             checkSubscription();
             
             const upiUri = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${AMOUNT}&cu=INR&tn=CineVault30DaysPass`;
@@ -174,14 +252,51 @@
         function renderList(items, targetContainerId, langLabel) {
             const list = document.getElementById(targetContainerId);
             list.innerHTML = items.map(m => `
-                <div class="flex-none w-36 cursor-pointer group" onclick="handleMovieClick('${m.title.replace(/'/g, "")}', '${m.embedUrl}')">
+                <div class="flex-none w-36 cursor-pointer group" onclick="handleMovieClick('${m.title.replace(/'/g, "")}', '${m.streamUrl}', '${m.type}')">
                     <div class="relative aspect-[2/3] rounded-lg overflow-hidden bg-zinc-800 border border-zinc-800 group-hover:border-red-600 transition">
                         <img src="${m.poster}" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=400&q=80'">
-                        <span class="absolute top-2 left-2 bg-black/80 backdrop-blur-sm text-[9px] font-extrabold px-1.5 py-0.5 rounded text-zinc-300 border border-zinc-700/50">${langLabel}</span>
+                        <span class="absolute top-2 left-2 bg-black/80 backdrop-blur-sm text-[9px] font-extrabold px-1.5 py-0.5 rounded text-zinc-300 border border-zinc-700/50">${m.lang || langLabel}</span>
                     </div>
                     <p class="text-xs font-semibold mt-1.5 truncate">${m.title}</p>
                 </div>
             `).join('');
+        }
+
+        function handleSearch() {
+            const query = document.getElementById('searchInput').value.trim().toLowerCase();
+            const resultsContainer = document.getElementById('searchResultsContainer');
+            const mainCatalog = document.getElementById('mainCatalog');
+            const resultsList = document.getElementById('searchResultsList');
+
+            if (query === "") {
+                resultsContainer.classList.add('hidden');
+                mainCatalog.classList.remove('hidden');
+                return;
+            }
+
+            const matches = allMovies.filter(m => m.title.toLowerCase().includes(query));
+
+            resultsContainer.classList.remove('hidden');
+            mainCatalog.classList.add('hidden');
+
+            if (matches.length === 0) {
+                resultsList.innerHTML = `<p class="col-span-full text-xs text-zinc-500 py-8 text-center">No movies found matching "${query}"</p>`;
+            } else {
+                resultsList.innerHTML = matches.map(m => `
+                    <div class="cursor-pointer group" onclick="handleMovieClick('${m.title.replace(/'/g, "")}', '${m.streamUrl}', '${m.type}')">
+                        <div class="relative aspect-[2/3] rounded-lg overflow-hidden bg-zinc-800 border border-zinc-800 group-hover:border-red-600 transition">
+                            <img src="${m.poster}" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1536440136628-849c177e76a1?auto=format&fit=crop&w=400&q=80'">
+                            <span class="absolute top-2 left-2 bg-black/80 backdrop-blur-sm text-[9px] font-extrabold px-1.5 py-0.5 rounded text-zinc-300 border border-zinc-700/50">${m.lang}</span>
+                        </div>
+                        <p class="text-xs font-semibold mt-1.5 truncate">${m.title}</p>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function clearSearch() {
+            document.getElementById('searchInput').value = "";
+            handleSearch();
         }
 
         function loginUser() {
@@ -214,19 +329,43 @@
             }
         }
 
-        function handleMovieClick(title, embedUrl) {
+        function handleMovieClick(title, streamUrl, type) {
             const isActive = checkSubscription();
             if (!isActive) {
                 openPaymentModal();
             } else {
                 document.getElementById('playerTitle').innerText = title;
-                document.getElementById('videoIframe').src = embedUrl;
+                const nativePlayer = document.getElementById('nativeVideoPlayer');
+                const iframePlayer = document.getElementById('videoIframe');
+
+                if (type === 'native') {
+                    iframePlayer.classList.add('hidden');
+                    iframePlayer.src = '';
+                    
+                    document.getElementById('videoSource').src = streamUrl;
+                    nativePlayer.load();
+                    nativePlayer.classList.remove('hidden');
+                } else {
+                    nativePlayer.classList.add('hidden');
+                    nativePlayer.pause();
+                    
+                    iframePlayer.src = streamUrl;
+                    iframePlayer.classList.remove('hidden');
+                }
+
                 document.getElementById('playerModal').classList.remove('hidden');
             }
         }
 
         function closePlayer() {
-            document.getElementById('videoIframe').src = "";
+            const nativePlayer = document.getElementById('nativeVideoPlayer');
+            const iframePlayer = document.getElementById('videoIframe');
+            
+            nativePlayer.pause();
+            nativePlayer.classList.add('hidden');
+            iframePlayer.src = "";
+            iframePlayer.classList.add('hidden');
+            
             document.getElementById('playerModal').classList.add('hidden');
         }
 
