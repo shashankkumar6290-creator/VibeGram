@@ -3,193 +3,432 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineVault | Streaming Pass</title>
+    <title>BeatStream | Premium Music Streaming</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .glass-panel { background: rgba(18, 18, 18, 0.85); backdrop-filter: blur(12px); }
     </style>
 </head>
-<body class="bg-zinc-950 text-white font-sans min-h-screen pb-12">
+<body class="bg-black text-zinc-100 font-sans min-h-screen select-none pb-28">
 
-    <!-- Mobile Login Section -->
-    <div id="loginSection" class="fixed inset-0 bg-zinc-950/95 backdrop-blur-md z-50 flex items-center justify-center p-6">
-        <div class="w-full max-w-sm space-y-6 text-center bg-zinc-900 border border-zinc-800 p-6 rounded-2xl shadow-2xl">
-            <h1 class="text-4xl font-black text-red-600 tracking-wider">CINEVAULT</h1>
-            <p class="text-xs text-zinc-400">Enter your mobile number to start streaming</p>
+    <!-- Mobile Login Screen -->
+    <div id="loginScreen" class="fixed inset-0 bg-black/95 backdrop-blur-xl z-50 flex items-center justify-center p-6">
+        <div class="w-full max-w-sm space-y-6 text-center bg-zinc-900/90 border border-zinc-800 p-8 rounded-3xl shadow-2xl">
+            <div class="flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-compact-disc text-green-500 text-3xl animate-spin" style="animation-duration: 8s;"></i>
+                <h1 class="text-3xl font-black text-white tracking-wider">BEATSTREAM</h1>
+            </div>
+            <p class="text-xs text-zinc-400">Stream millions of songs instantly. Enter your mobile number to get started.</p>
             <div class="space-y-4 text-left">
                 <div>
                     <label class="text-[11px] text-zinc-400 font-semibold block mb-1">Mobile Number</label>
-                    <div class="flex items-center bg-zinc-950 border border-zinc-800 rounded-lg overflow-hidden focus-within:border-red-600">
-                        <span class="px-3 text-xs text-zinc-400 border-r border-zinc-800">+91</span>
-                        <input type="tel" id="userPhone" maxlength="10" placeholder="9876543210" class="w-full bg-transparent text-xs text-white p-3 focus:outline-none font-mono">
+                    <div class="flex items-center bg-zinc-950 border border-zinc-800 rounded-xl overflow-hidden focus-within:border-green-500 transition">
+                        <span class="px-3 text-xs text-zinc-400 border-r border-zinc-800 font-mono">+91</span>
+                        <input type="tel" id="userPhone" maxlength="10" placeholder="9876543210" class="w-full bg-transparent text-xs text-white p-3.5 focus:outline-none font-mono tracking-widest">
                     </div>
                 </div>
-                <button onclick="loginUser()" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold text-xs py-3 rounded-lg transition shadow-lg shadow-red-600/20">Continue to App</button>
+                <button onclick="loginUser()" class="w-full bg-green-500 hover:bg-green-600 text-black font-bold text-xs py-3.5 rounded-xl transition shadow-lg shadow-green-500/20 uppercase tracking-wider">Start Listening</button>
             </div>
         </div>
     </div>
 
-    <!-- Navigation Header -->
-    <nav class="flex flex-col sm:flex-row items-center justify-between px-6 py-4 bg-zinc-900/80 sticky top-0 z-40 backdrop-blur-md border-b border-zinc-800 gap-4">
-        <div class="flex items-center justify-between w-full sm:w-auto">
-            <span class="text-red-600 text-2xl font-black tracking-wider">CINEVAULT</span>
-            <span id="navPhoneMobile" class="text-[11px] text-zinc-400 sm:hidden font-mono"></span>
-        </div>
-
-        <!-- Search Bar -->
-        <div class="w-full sm:max-w-md relative">
-            <input type="text" id="searchInput" oninput="handleSearch()" placeholder="Search movies..." class="w-full bg-zinc-950 border border-zinc-800 text-xs text-white px-4 py-2 rounded-full focus:outline-none focus:border-red-600 transition pl-9">
-            <svg class="w-4 h-4 text-zinc-500 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
-        </div>
-
+    <!-- Top Navigation Header -->
+    <nav class="flex items-center justify-between px-6 py-4 bg-zinc-950/80 sticky top-0 z-40 backdrop-blur-md border-b border-zinc-900">
         <div class="flex items-center space-x-3">
-            <span id="navPhone" class="text-[11px] text-zinc-400 hidden sm:inline font-mono"></span>
-            <button onclick="openPaymentModal()" id="subStatusBtn" class="bg-red-600 hover:bg-red-700 text-white text-xs font-bold px-4 py-2 rounded-full transition shadow-md">
-                Subscribe ₹10
+            <i class="fa-solid fa-compact-disc text-green-500 text-2xl"></i>
+            <span class="text-white text-xl font-black tracking-wider">BEATSTREAM</span>
+        </div>
+
+        <div class="flex items-center space-x-4">
+            <div id="subStatusBadge" class="hidden sm:flex items-center space-x-1.5 bg-zinc-900 border border-zinc-800 px-3 py-1 rounded-full text-[11px] font-semibold">
+                <span class="w-2 h-2 rounded-full bg-zinc-500" id="badgeDot"></span>
+                <span id="badgeText" class="text-zinc-400">Free Tier</span>
+            </div>
+
+            <button onclick="openPaymentModal()" id="premiumUpgradeBtn" class="bg-green-500 hover:bg-green-400 text-black text-xs font-extrabold px-4 py-2 rounded-full transition shadow-md flex items-center space-x-1.5">
+                <i class="fa-solid fa-crown text-[11px]"></i>
+                <span>Get Premium ₹10</span>
             </button>
+
+            <div class="flex items-center space-x-2 border-l border-zinc-800 pl-4">
+                <span id="navPhone" class="text-xs font-mono text-zinc-400 hidden sm:inline"></span>
+                <button onclick="logoutUser()" title="Logout" class="text-zinc-400 hover:text-white text-xs p-2">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </button>
+            </div>
         </div>
     </nav>
 
-    <!-- Search Results Area -->
-    <div id="searchResultsContainer" class="px-6 mt-6 hidden">
-        <div class="flex items-center justify-between mb-3">
-            <h2 class="text-sm font-bold text-zinc-200 uppercase tracking-wider flex items-center gap-2">
-                <span class="w-2 h-2 bg-red-600 rounded-full animate-ping"></span>
-                Search Results
-            </h2>
-            <button onclick="clearSearch()" class="text-xs text-zinc-400 hover:text-white">Clear Filter</button>
+    <!-- Ad Banner for Free Users -->
+    <div id="adBanner" class="bg-gradient-to-r from-purple-900/60 to-indigo-900/60 border-b border-purple-500/20 px-6 py-2.5 flex items-center justify-between text-xs">
+        <div class="flex items-center space-x-2">
+            <span class="bg-purple-500 text-black font-bold text-[9px] px-1.5 py-0.5 rounded uppercase">Ad</span>
+            <span class="text-zinc-200">Enjoying Music? Upgrade to <strong>Premium (₹10/mo)</strong> to remove ads & enable offline downloads!</span>
         </div>
-        <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4" id="searchResultsList"></div>
+        <button onclick="openPaymentModal()" class="text-green-400 font-bold hover:underline">Upgrade Now</button>
     </div>
 
-    <!-- Main Catalog -->
-    <div id="mainCatalog">
-        <div class="relative w-full h-[380px] bg-cover bg-center flex items-end p-6" style="background-image: linear-gradient(to top, rgba(9,9,11,1), rgba(9,9,11,0.3)), url('https://image.tmdb.org/t/p/original/8Y43POKjjKDGI9A79uM3R1M33sI.jpg');">
-            <div class="max-w-xl space-y-2">
-                <span class="bg-red-600/30 text-red-400 text-[10px] font-bold px-2 py-0.5 rounded border border-red-500/30 uppercase tracking-wide">Featured Stream</span>
-                <h1 class="text-3xl font-bold tracking-tight">Watch Any Movie Instantly</h1>
-                <p class="text-xs text-zinc-300">Access full HD streaming servers for Indian and global blockbusters.</p>
-                <div class="pt-2">
-                    <button onclick="openPaymentModal()" class="bg-white text-black font-bold text-xs px-6 py-2.5 rounded-lg hover:bg-zinc-200 transition">▶ Activate ₹10 Pass</button>
+    <!-- App Main Layout -->
+    <div class="p-6 max-w-7xl mx-auto space-y-8">
+        
+        <!-- Search & Filter Bar -->
+        <div class="flex flex-col sm:flex-row gap-4 items-center justify-between">
+            <div class="relative w-full sm:max-w-md">
+                <input type="text" id="searchInput" onkeyup="handleSearch(event)" placeholder="Search songs, artists, or albums..." class="w-full bg-zinc-900 border border-zinc-800 text-xs text-white px-4 py-3 rounded-full focus:outline-none focus:border-green-500 transition pl-10">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-zinc-500 text-xs"></i>
+            </div>
+
+            <!-- Tab Switching Buttons -->
+            <div class="flex items-center space-x-2 bg-zinc-900 p-1 rounded-full border border-zinc-800 w-full sm:w-auto justify-center">
+                <button onclick="switchTab('home')" id="tabHome" class="px-5 py-1.5 rounded-full text-xs font-bold bg-green-500 text-black transition">Home</button>
+                <button onclick="switchTab('downloads')" id="tabDownloads" class="px-5 py-1.5 rounded-full text-xs font-bold text-zinc-400 hover:text-white transition flex items-center space-x-1.5">
+                    <i class="fa-solid fa-circle-down"></i>
+                    <span>Downloads</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Home View Tab -->
+        <div id="viewHome" class="space-y-8">
+            <!-- Featured Banner -->
+            <div class="relative w-full h-48 rounded-3xl bg-cover bg-center overflow-hidden flex items-end p-6 border border-zinc-800 shadow-2xl" style="background-image: linear-gradient(to top, rgba(0,0,0,0.9), rgba(0,0,0,0.2)), url('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=1200&q=80');">
+                <div class="space-y-1">
+                    <span class="text-green-400 text-[10px] font-bold tracking-widest uppercase bg-green-950/80 px-2 py-0.5 rounded border border-green-800">Trending Now</span>
+                    <h1 class="text-2xl font-black text-white">Unlimited Music Access</h1>
+                    <p class="text-xs text-zinc-300">Play top charts and download your favorites for offline listening.</p>
                 </div>
             </div>
-        </div>
 
-        <div class="px-6 mt-6 space-y-8">
+            <!-- Trending Songs Grid -->
             <div>
-                <h2 class="text-sm font-bold text-zinc-200 uppercase tracking-wider mb-3">Popular Movies</h2>
-                <div class="flex space-x-4 overflow-x-auto no-scrollbar pb-2" id="movieList"></div>
+                <h2 class="text-sm font-extrabold text-zinc-200 uppercase tracking-wider mb-4 flex items-center space-x-2">
+                    <i class="fa-solid fa-fire text-red-500"></i>
+                    <span>Popular Tracks</span>
+                </h2>
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4" id="songGrid"></div>
+            </div>
+        </div>
+
+        <!-- Offline Downloads Tab -->
+        <div id="viewDownloads" class="hidden space-y-4">
+            <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+                <h2 class="text-sm font-extrabold text-zinc-200 uppercase tracking-wider flex items-center space-x-2">
+                    <i class="fa-solid fa-circle-down text-green-500"></i>
+                    <span>Downloaded Music (Offline)</span>
+                </h2>
+                <span id="downloadCount" class="text-xs text-zinc-400">0 songs saved</span>
+            </div>
+
+            <div id="downloadedList" class="space-y-2"></div>
+        </div>
+
+    </div>
+
+    <!-- Persistent Bottom Music Player -->
+    <div class="fixed bottom-0 left-0 right-0 glass-panel border-t border-zinc-800 p-3 z-40 flex items-center justify-between px-6">
+        <!-- Track Info -->
+        <div class="flex items-center space-x-3 w-1/4">
+            <img id="playerCover" src="https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=150&q=80" class="w-12 h-12 rounded-lg object-cover border border-zinc-800">
+            <div class="truncate">
+                <h4 id="playerTitle" class="text-xs font-bold text-white truncate">Select a song</h4>
+                <p id="playerArtist" class="text-[11px] text-zinc-400 truncate">BeatStream Player</p>
+            </div>
+            <button onclick="downloadCurrentSong()" title="Download Track" class="text-zinc-400 hover:text-green-500 text-xs p-1">
+                <i class="fa-solid fa-download"></i>
+            </button>
+        </div>
+
+        <!-- Controls & Progress -->
+        <div class="flex flex-col items-center space-y-1 w-2/4 max-w-md">
+            <div class="flex items-center space-x-6 text-zinc-300">
+                <button onclick="toggleShuffle()" id="btnShuffle" title="Shuffle" class="text-zinc-500 hover:text-white text-xs"><i class="fa-solid fa-shuffle"></i></button>
+                <button onclick="prevTrack()" title="Previous" class="hover:text-white text-sm"><i class="fa-solid fa-backward-step"></i></button>
+                <button onclick="togglePlayPause()" id="btnPlay" class="w-8 h-8 rounded-full bg-white text-black flex items-center justify-center hover:scale-105 transition">
+                    <i class="fa-solid fa-play text-xs pl-0.5"></i>
+                </button>
+                <button onclick="nextTrack()" title="Next" class="hover:text-white text-sm"><i class="fa-solid fa-forward-step"></i></button>
+                <button onclick="toggleLyricsModal()" title="Lyrics" class="text-zinc-400 hover:text-white text-xs"><i class="fa-solid fa-quote-right"></i></button>
+            </div>
+
+            <!-- Timeline Progress Bar -->
+            <div class="w-full flex items-center space-x-2 text-[10px] font-mono text-zinc-400">
+                <span id="currTime">0:00</span>
+                <input type="range" id="seekSlider" value="0" min="0" max="100" oninput="seekTrack(this.value)" class="w-full h-1 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-green-500">
+                <span id="totalTime">0:00</span>
+            </div>
+        </div>
+
+        <!-- Volume Control -->
+        <div class="flex items-center justify-end space-x-2 w-1/4">
+            <i class="fa-solid fa-volume-high text-xs text-zinc-400"></i>
+            <input type="range" id="volumeSlider" value="100" min="0" max="100" oninput="setVolume(this.value)" class="w-20 h-1 bg-zinc-800 rounded-lg appearance-none cursor-pointer accent-green-500">
+        </div>
+    </div>
+
+    <!-- Lyrics Modal -->
+    <div id="lyricsModal" class="fixed inset-0 bg-black/95 z-50 hidden flex flex-col p-8 backdrop-blur-xl">
+        <div class="flex justify-between items-center border-b border-zinc-800 pb-4">
+            <h3 class="text-sm font-bold text-green-500 uppercase">Live Lyrics</h3>
+            <button onclick="toggleLyricsModal()" class="text-zinc-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="flex-1 flex flex-col items-center justify-center text-center p-6 space-y-4">
+            <h2 id="lyricsTrackTitle" class="text-xl font-black text-white">Song Title</h2>
+            <div id="lyricsContent" class="text-sm text-zinc-400 space-y-3 font-serif max-w-md overflow-y-auto no-scrollbar max-h-96">
+                <p>♪ Synchronized lyrics available on BeatStream Premium ♪</p>
             </div>
         </div>
     </div>
 
-    <!-- Video Player Modal -->
-    <div id="playerModal" class="fixed inset-0 bg-black/95 z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-zinc-900 border border-zinc-800 rounded-xl w-full max-w-4xl overflow-hidden relative shadow-2xl">
-            <div class="p-3 bg-zinc-950 flex justify-between items-center border-b border-zinc-800">
-                <h3 id="playerTitle" class="text-sm font-bold truncate">Now Playing</h3>
-                <button onclick="closePlayer()" class="text-zinc-400 hover:text-white text-xl px-2">✕</button>
+    <!-- ₹10 UPI Payment Modal -->
+    <div id="paymentModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-3xl max-w-sm w-full p-6 text-center space-y-5 shadow-2xl">
+            <div class="space-y-1">
+                <div class="inline-flex items-center space-x-1 text-yellow-500 bg-yellow-500/10 px-3 py-1 rounded-full text-xs font-bold border border-yellow-500/20">
+                    <i class="fa-solid fa-crown text-[10px]"></i>
+                    <span>BeatStream Premium Pass</span>
+                </div>
+                <h3 class="text-xl font-bold text-white pt-2">Activate for ₹10</h3>
+                <p class="text-xs text-zinc-400">Valid for 30 Days • Offline Downloads • Zero Ads</p>
             </div>
-            <div class="aspect-video w-full bg-black relative">
-                <iframe id="videoIframe" class="w-full h-full" src="" frameborder="0" allowfullscreen></iframe>
-            </div>
-        </div>
-    </div>
 
-    <!-- UPI Modal -->
-    <div id="paymentModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-zinc-900 border border-zinc-800 rounded-2xl max-w-sm w-full p-6 text-center space-y-4">
-            <h3 class="text-lg font-bold">Activate Pass</h3>
-            <p class="text-xs text-zinc-400">Unlimited access for 30 days at <strong>₹10</strong></p>
-            <div class="bg-zinc-950 p-4 rounded-xl border border-zinc-800 space-y-3 flex flex-col items-center">
-                <img id="upiQrImg" src="" alt="QR" class="w-36 h-36 bg-white p-2 rounded-lg">
-                <a id="upiPayBtn" href="#" class="w-full bg-green-600 text-white font-bold text-xs py-2 rounded-lg">Pay ₹10 via UPI App</a>
+            <!-- UPI QR Code & Link -->
+            <div class="bg-zinc-950 p-4 rounded-2xl border border-zinc-800 space-y-3 flex flex-col items-center">
+                <img id="upiQrImg" src="" alt="UPI QR" class="w-40 h-40 bg-white p-2 rounded-xl">
+                <a id="upiPayBtn" href="#" class="w-full bg-green-500 hover:bg-green-400 text-black font-extrabold text-xs py-2.5 rounded-xl transition flex items-center justify-center space-x-2">
+                    <i class="fa-solid fa-mobile-screen"></i>
+                    <span>Pay ₹10 via GPay / PhonePe / Paytm</span>
+                </a>
             </div>
+
+            <!-- UTR Verification Input -->
             <div class="space-y-2 text-left">
-                <input type="text" id="utrInput" maxlength="12" placeholder="12-Digit UTR Number" class="w-full bg-zinc-950 border border-zinc-800 text-xs text-white p-2.5 rounded-lg">
-                <button onclick="verifyAndActivate()" class="w-full bg-red-600 text-white font-bold text-xs py-2.5 rounded-lg">Verify & Activate</button>
+                <label class="text-[11px] text-zinc-400 font-semibold block">Enter 12-Digit UTR / Ref Number</label>
+                <input type="text" id="utrInput" maxlength="12" placeholder="e.g. 409812345678" class="w-full bg-zinc-950 border border-zinc-800 text-xs text-white p-3 rounded-xl focus:outline-none focus:border-green-500 font-mono">
+                <button onclick="verifyAndActivate()" class="w-full bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-xs py-3 rounded-xl transition border border-zinc-700">Verify Transaction</button>
             </div>
-            <button onclick="closePaymentModal()" class="text-xs text-zinc-500">Cancel</button>
+
+            <button onclick="closePaymentModal()" class="text-xs text-zinc-500 hover:text-white">Cancel</button>
         </div>
     </div>
 
+    <!-- Hidden YouTube Audio Player API Engine -->
+    <div id="youtubePlayerContainer" class="hidden"></div>
+
+    <script src="https://www.youtube.com/iframe_api"></script>
     <script>
         const UPI_ID = "9431920376@fam";
-        let currentUser = localStorage.getItem('cinevault_phone');
+        let currentUser = localStorage.getItem('beatstream_phone');
+        let ytPlayer = null;
+        let isPlaying = false;
+        let isShuffle = false;
+        let currentTrackIndex = 0;
+        let updateInterval = null;
 
-        // Using VidSrc Movie Embed Engines (Uses TMDB or IMDb IDs to stream full movies)
-        const movies = [
-            { title: "Oppenheimer", tmdbId: "872585", poster: "https://image.tmdb.org/t/p/w500/8Gxv8gSFCU0XGDykEGvRzR1n2ua.jpg" },
-            { title: "Spider-Man: Across the Spider-Verse", tmdbId: "569094", poster: "https://image.tmdb.org/t/p/w500/8Vt6mWEReuy4Of61Lnj5Xj7sR18.jpg" },
-            { title: "Dune: Part Two", tmdbId: "693134", poster: "https://image.tmdb.org/t/p/w500/1pdfLvkbY9ohJlRjA2CZS9ivRTo.jpg" },
-            { title: "Avatar: The Way of Water", tmdbId: "76600", poster: "https://image.tmdb.org/t/p/w500/t6HIfvMGNVChM2vFiR64A8O80EX.jpg" }
+        // Song Catalog (YouTube Video IDs)
+        const playlist = [
+            { id: "kJQP7kiw5Fk", title: "Despacito", artist: "Luis Fonsi ft. Daddy Yankee", cover: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=300&q=80" },
+            { id: "JGwWNGJdvx8", title: "Shape of You", artist: "Ed Sheeran", cover: "https://images.unsplash.com/photo-1470225620780-dba8ba36b745?auto=format&fit=crop&w=300&q=80" },
+            { id: "OPf0YbXqDm0", title: "Uptown Funk", artist: "Mark Ronson ft. Bruno Mars", cover: "https://images.unsplash.com/photo-1514525253161-7a46d19cd819?auto=format&fit=crop&w=300&q=80" },
+            { id: "09R8_2nJtjg", title: "Sugar", artist: "Maroon 5", cover: "https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?auto=format&fit=crop&w=300&q=80" },
+            { id: "2Vv-BfVoq4g", title: "Perfect", artist: "Ed Sheeran", cover: "https://images.unsplash.com/photo-1459749411175-04bf5292ceea?auto=format&fit=crop&w=300&q=80" },
+            { id: "fJ9rUzIMcZQ", title: "Bohemian Rhapsody", artist: "Queen", cover: "https://images.unsplash.com/photo-1511379938547-c1f69419868d?auto=format&fit=crop&w=300&q=80" }
         ];
 
+        // IndexedDB Database Setup for Offline Downloads
+        let db;
+        const request = indexedDB.open("BeatStreamDB", 1);
+        request.onupgradeneeded = (e) => {
+            db = e.target.result;
+            if (!db.objectStoreNames.contains("downloads")) {
+                db.createObjectStore("downloads", { keyPath: "id" });
+            }
+        };
+        request.onsuccess = (e) => { db = e.target.result; loadOfflineDownloads(); };
+
+        // App Initialization
         function initApp() {
             if (!currentUser) {
-                document.getElementById('loginSection').classList.remove('hidden');
+                document.getElementById('loginScreen').classList.remove('hidden');
                 return;
             }
-            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('loginScreen').classList.add('hidden');
             document.getElementById('navPhone').innerText = `+91 ${currentUser}`;
-            checkSubscription();
             
-            const upiUri = `upi://pay?pa=${UPI_ID}&pn=CineVault&am=10&cu=INR`;
-            document.getElementById('upiPayBtn').href = upiUri;
-            document.getElementById('upiQrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiUri)}`;
-
-            renderList();
+            checkSubscription();
+            setupUPI();
+            renderSongGrid(playlist);
         }
 
-        function renderList() {
-            const list = document.getElementById('movieList');
-            list.innerHTML = movies.map(m => `
-                <div class="flex-none w-36 cursor-pointer group" onclick="playMovie('${m.title}', '${m.tmdbId}')">
-                    <div class="relative aspect-[2/3] rounded-lg overflow-hidden bg-zinc-800 border border-zinc-800 group-hover:border-red-600 transition">
-                        <img src="${m.poster}" class="w-full h-full object-cover">
+        function onYouTubeIframeAPIReady() {
+            ytPlayer = new YT.Player('youtubePlayerContainer', {
+                height: '0',
+                width: '0',
+                videoId: playlist[0].id,
+                events: {
+                    'onStateChange': onPlayerStateChange
+                }
+            });
+        }
+
+        function onPlayerStateChange(event) {
+            if (event.data === YT.PlayerState.PLAYING) {
+                isPlaying = true;
+                updatePlayBtnUI();
+                startProgressTimer();
+            } else if (event.data === YT.PlayerState.PAUSED) {
+                isPlaying = false;
+                updatePlayBtnUI();
+                clearInterval(updateInterval);
+            } else if (event.data === YT.PlayerState.ENDED) {
+                nextTrack();
+            }
+        }
+
+        function playTrack(index) {
+            currentTrackIndex = index;
+            const song = playlist[index];
+
+            document.getElementById('playerTitle').innerText = song.title;
+            document.getElementById('playerArtist').innerText = song.artist;
+            document.getElementById('playerCover').src = song.cover;
+            document.getElementById('lyricsTrackTitle').innerText = song.title;
+
+            if (ytPlayer && ytPlayer.loadVideoById) {
+                ytPlayer.loadVideoById(song.id);
+                isPlaying = true;
+                updatePlayBtnUI();
+            }
+        }
+
+        function togglePlayPause() {
+            if (!ytPlayer) return;
+            if (isPlaying) {
+                ytPlayer.pauseVideo();
+            } else {
+                ytPlayer.playVideo();
+            }
+        }
+
+        function updatePlayBtnUI() {
+            const btn = document.getElementById('btnPlay');
+            btn.innerHTML = isPlaying ? `<i class="fa-solid fa-pause text-xs"></i>` : `<i class="fa-solid fa-play text-xs pl-0.5"></i>`;
+        }
+
+        function nextTrack() {
+            let nextIndex = isShuffle ? Math.floor(Math.random() * playlist.length) : (currentTrackIndex + 1) % playlist.length;
+            playTrack(nextIndex);
+        }
+
+        function prevTrack() {
+            let prevIndex = (currentTrackIndex - 1 + playlist.length) % playlist.length;
+            playTrack(prevIndex);
+        }
+
+        function toggleShuffle() {
+            isShuffle = !isShuffle;
+            document.getElementById('btnShuffle').className = isShuffle ? "text-green-500 text-xs" : "text-zinc-500 hover:text-white text-xs";
+        }
+
+        function startProgressTimer() {
+            clearInterval(updateInterval);
+            updateInterval = setInterval(() => {
+                if (ytPlayer && ytPlayer.getCurrentTime) {
+                    const curr = ytPlayer.getCurrentTime();
+                    const total = ytPlayer.getDuration();
+                    if (total > 0) {
+                        document.getElementById('seekSlider').value = (curr / total) * 100;
+                        document.getElementById('currTime').innerText = formatTime(curr);
+                        document.getElementById('totalTime').innerText = formatTime(total);
+                    }
+                }
+            }, 1000);
+        }
+
+        function seekTrack(val) {
+            if (ytPlayer && ytPlayer.getDuration) {
+                const seekTo = (val / 100) * ytPlayer.getDuration();
+                ytPlayer.seekTo(seekTo, true);
+            }
+        }
+
+        function setVolume(val) {
+            if (ytPlayer && ytPlayer.setVolume) {
+                ytPlayer.setVolume(val);
+            }
+        }
+
+        function formatTime(sec) {
+            const m = Math.floor(sec / 60);
+            const s = Math.floor(sec % 60);
+            return `${m}:${s < 10 ? '0' : ''}${s}`;
+        }
+
+        function renderSongGrid(songs) {
+            const grid = document.getElementById('songGrid');
+            grid.innerHTML = songs.map((s, idx) => `
+                <div class="bg-zinc-900/60 border border-zinc-800/80 p-3 rounded-2xl group hover:border-green-500/50 transition cursor-pointer" onclick="playTrack(${idx})">
+                    <div class="relative aspect-square rounded-xl overflow-hidden mb-2 bg-zinc-950">
+                        <img src="${s.cover}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition">
+                            <div class="w-10 h-10 rounded-full bg-green-500 text-black flex items-center justify-center shadow-lg">
+                                <i class="fa-solid fa-play text-xs pl-0.5"></i>
+                            </div>
+                        </div>
                     </div>
-                    <p class="text-xs font-semibold mt-1.5 truncate">${m.title}</p>
+                    <h3 class="text-xs font-bold text-white truncate">${s.title}</h3>
+                    <p class="text-[10px] text-zinc-400 truncate">${s.artist}</p>
                 </div>
             `).join('');
         }
 
-        function playMovie(title, tmdbId) {
-            if (!checkSubscription()) {
-                openPaymentModal();
-            } else {
-                document.getElementById('playerTitle').innerText = title;
-                // VidSrc server embed URL using TMDB ID
-                document.getElementById('videoIframe').src = `https://vidsrc.cc/v2/embed/movie/${tmdbId}`;
-                document.getElementById('playerModal').classList.remove('hidden');
-            }
+        function handleSearch(e) {
+            const query = e.target.value.toLowerCase();
+            const filtered = playlist.filter(s => s.title.toLowerCase().includes(query) || s.artist.toLowerCase().includes(query));
+            renderSongGrid(filtered);
         }
 
-        function closePlayer() {
-            document.getElementById('videoIframe').src = "";
-            document.getElementById('playerModal').classList.add('hidden');
+        function switchTab(tab) {
+            document.getElementById('viewHome').classList.toggle('hidden', tab !== 'home');
+            document.getElementById('viewDownloads').classList.toggle('hidden', tab !== 'downloads');
+            document.getElementById('tabHome').className = tab === 'home' ? 'px-5 py-1.5 rounded-full text-xs font-bold bg-green-500 text-black transition' : 'px-5 py-1.5 rounded-full text-xs font-bold text-zinc-400 hover:text-white transition';
+            document.getElementById('tabDownloads').className = tab === 'downloads' ? 'px-5 py-1.5 rounded-full text-xs font-bold bg-green-500 text-black transition flex items-center space-x-1.5' : 'px-5 py-1.5 rounded-full text-xs font-bold text-zinc-400 hover:text-white transition flex items-center space-x-1.5';
         }
 
+        // Login & Subscriptions
         function loginUser() {
             const phone = document.getElementById('userPhone').value.trim();
-            if (phone.length === 10) {
-                localStorage.setItem('cinevault_phone', phone);
+            if (phone.length === 10 && !isNaN(phone)) {
+                localStorage.setItem('beatstream_phone', phone);
                 currentUser = phone;
                 initApp();
             }
         }
 
+        function logoutUser() {
+            localStorage.removeItem('beatstream_phone');
+            location.reload();
+        }
+
         function checkSubscription() {
             const expiry = localStorage.getItem(`sub_expiry_${currentUser}`);
-            const subBtn = document.getElementById('subStatusBtn');
-            if (expiry && new Date().getTime() < parseInt(expiry)) {
-                subBtn.innerText = "Pass Active";
-                subBtn.className = "bg-green-600 text-white text-xs font-bold px-4 py-2 rounded-full";
-                return true;
-            }
-            return false;
+            const isPremium = expiry && new Date().getTime() < parseInt(expiry);
+
+            document.getElementById('adBanner').classList.toggle('hidden', isPremium);
+            document.getElementById('badgeDot').className = isPremium ? "w-2 h-2 rounded-full bg-green-500" : "w-2 h-2 rounded-full bg-zinc-500";
+            document.getElementById('badgeText').innerText = isPremium ? "Premium Pass" : "Free Tier";
+            document.getElementById('badgeText').className = isPremium ? "text-green-400 font-bold" : "text-zinc-400";
+            document.getElementById('premiumUpgradeBtn').innerText = isPremium ? "Pass Active" : "Get Premium ₹10";
+
+            return isPremium;
+        }
+
+        function setupUPI() {
+            const upiUri = `upi://pay?pa=${UPI_ID}&pn=BeatStream&am=10&cu=INR`;
+            document.getElementById('upiPayBtn').href = upiUri;
+            document.getElementById('upiQrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiUri)}`;
         }
 
         function openPaymentModal() { document.getElementById('paymentModal').classList.remove('hidden'); }
@@ -197,11 +436,67 @@
 
         function verifyAndActivate() {
             const utr = document.getElementById('utrInput').value.trim();
-            if (utr.length === 12) {
-                localStorage.setItem(`sub_expiry_${currentUser}`, new Date().getTime() + (30*24*60*60*1000));
+            if (utr.length === 12 && !isNaN(utr)) {
+                localStorage.setItem(`sub_expiry_${currentUser}`, new Date().getTime() + (30 * 24 * 60 * 60 * 1000));
                 closePaymentModal();
                 checkSubscription();
+                alert("🎉 Premium Pass Activated for 30 Days!");
+            } else {
+                alert("Please enter a valid 12-digit UTR/Ref number.");
             }
+        }
+
+        // Offline Download Engine (IndexedDB)
+        function downloadCurrentSong() {
+            if (!checkSubscription()) {
+                openPaymentModal();
+                return;
+            }
+
+            const song = playlist[currentTrackIndex];
+            const tx = db.transaction("downloads", "readwrite");
+            const store = tx.objectStore("downloads");
+            store.put(song);
+
+            tx.oncomplete = () => {
+                alert(`Downloaded "${song.title}" for offline playback!`);
+                loadOfflineDownloads();
+            };
+        }
+
+        function loadOfflineDownloads() {
+            if (!db) return;
+            const tx = db.transaction("downloads", "readonly");
+            const store = tx.objectStore("downloads");
+            const request = store.getAll();
+
+            request.onsuccess = () => {
+                const downloads = request.result;
+                document.getElementById('downloadCount').innerText = `${downloads.length} songs saved`;
+                const list = document.getElementById('downloadedList');
+
+                if (downloads.length === 0) {
+                    list.innerHTML = `<p class="text-xs text-zinc-500 py-4">No downloaded tracks yet. Click the download icon on any song to save offline.</p>`;
+                    return;
+                }
+
+                list.innerHTML = downloads.map((s, idx) => `
+                    <div class="flex items-center justify-between bg-zinc-900 border border-zinc-800 p-3 rounded-xl">
+                        <div class="flex items-center space-x-3">
+                            <img src="${s.cover}" class="w-10 h-10 rounded-lg object-cover">
+                            <div>
+                                <h4 class="text-xs font-bold text-white">${s.title}</h4>
+                                <p class="text-[10px] text-zinc-400">${s.artist}</p>
+                            </div>
+                        </div>
+                        <button onclick="playTrack(${playlist.findIndex(p => p.id === s.id)})" class="text-green-500 text-xs px-3 py-1 bg-green-500/10 border border-green-500/20 rounded-full font-bold">Play</button>
+                    </div>
+                `).join('');
+            };
+        }
+
+        function toggleLyricsModal() {
+            document.getElementById('lyricsModal').classList.toggle('hidden');
         }
 
         initApp();
