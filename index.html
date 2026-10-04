@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>WallPaperVault | 4K Ultra HD Wallpapers</title>
+    <title>WallPaperVault | 4K & Live Wallpapers</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -40,6 +40,7 @@
                 <button onclick="filterCategory('all')" id="catAll" class="px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white transition">All Wallpapers</button>
                 <button onclick="filterCategory('boys')" id="catBoys" class="px-4 py-2 rounded-xl text-xs font-bold bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800 transition">Boys (Cars/Gaming)</button>
                 <button onclick="filterCategory('girls')" id="catGirls" class="px-4 py-2 rounded-xl text-xs font-bold bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800 transition">Girls (Aesthetic/Anime)</button>
+                <button onclick="filterCategory('live')" id="catLive" class="px-4 py-2 rounded-xl text-xs font-bold bg-zinc-900 text-amber-400 hover:text-amber-300 border border-amber-500/30 transition"><i class="fa-solid fa-play mr-1"></i> Live Wallpapers</button>
             </div>
 
             <div class="flex items-center space-x-2 bg-zinc-900 p-1 rounded-xl border border-zinc-800">
@@ -59,9 +60,9 @@
             <div class="space-y-1">
                 <div class="inline-flex items-center space-x-1 text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-full text-xs font-bold border border-indigo-500/20">
                     <i class="fa-solid fa-lock text-[10px]"></i>
-                    <span>Unlock 4K Ultra-HD Original</span>
+                    <span>Unlock Ultra-HD Original</span>
                 </div>
-                <h3 id="modalWallTitle" class="text-xl font-bold text-white pt-2">4K Wallpaper</h3>
+                <h3 id="modalWallTitle" class="text-xl font-bold text-white pt-2">Wallpaper</h3>
                 <p class="text-xs text-zinc-400">Pay ₹10 via UPI to unlock high-res download</p>
             </div>
 
@@ -111,8 +112,13 @@
         let currentCategory = 'all';
         let currentFormat = 'all';
 
-        // Catalog: 26 Wallpapers with Unique Unlock Codes
+        // Catalog: 28 Total Wallpapers (26 Static + 2 Live), all priced at ₹10
         const wallpapers = [
+            // --- Live Wallpapers ---
+            { id: 27, title: "BMW M5 Neon Night Live", category: "live", format: "phone", price: 10, code: "LIVEBMW", isLive: true, videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4", img: "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=800&q=80" },
+            { id: 28, title: "Cyberpunk Anime Rain Live", category: "live", format: "phone", price: 10, code: "LIVERAIN", isLive: true, videoUrl: "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4", img: "https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=800&q=80" },
+
+            // --- Regular 26 Wallpapers ---
             { id: 1, title: "BMW M4 Competition Dark", category: "boys", format: "pc", price: 10, code: "M4DARK", img: "https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1200&q=80" },
             { id: 2, title: "Neon Cyberpunk Girl", category: "girls", format: "phone", price: 10, code: "NEONGIRL", img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80" },
             { id: 3, title: "BMW M5 Supercar Night", category: "boys", format: "phone", price: 10, code: "M5NIGHT", img: "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=800&q=80" },
@@ -145,6 +151,23 @@
             return localStorage.getItem(`unlocked_wall_${id}`) === 'true';
         }
 
+        async function downloadWallpaper(url, filename) {
+            try {
+                const response = await fetch(url);
+                const blob = await response.blob();
+                const blobUrl = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = blobUrl;
+                link.download = filename;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(blobUrl);
+            } catch (error) {
+                window.open(url, '_blank');
+            }
+        }
+
         function renderGallery() {
             const grid = document.getElementById('wallpaperGrid');
             const filtered = wallpapers.filter(w => {
@@ -158,7 +181,15 @@
                 return `
                     <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden group flex flex-col justify-between">
                         <div class="relative ${w.format === 'phone' ? 'aspect-[9/16]' : 'aspect-video'} bg-zinc-950 overflow-hidden">
-                            <img src="${w.img}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            ${w.isLive ? `
+                                <video src="${w.videoUrl}" class="w-full h-full object-cover" autoplay loop muted playsinline poster="${w.img}"></video>
+                                <span class="absolute top-3 left-3 bg-amber-500/90 backdrop-blur-md text-black text-[10px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider flex items-center space-x-1 z-10">
+                                    <i class="fa-solid fa-play text-[8px]"></i> <span>LIVE</span>
+                                </span>
+                            ` : `
+                                <img src="${w.img}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            `}
+
                             ${!unlocked ? `
                                 <div class="absolute inset-0 watermark-overlay flex flex-col items-center justify-center p-4 text-center">
                                     <span class="bg-black/70 backdrop-blur-md text-white font-extrabold text-[10px] px-3 py-1 rounded-full border border-white/20 uppercase tracking-widest mb-1">
@@ -166,7 +197,7 @@
                                     </span>
                                 </div>
                             ` : `
-                                <div class="absolute top-3 right-3 bg-indigo-600 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full shadow-lg">
+                                <div class="absolute top-3 right-3 bg-indigo-600 text-white text-[10px] font-extrabold px-2.5 py-1 rounded-full shadow-lg z-10">
                                     <i class="fa-solid fa-circle-check mr-1"></i> Unlocked
                                 </div>
                             `}
@@ -178,18 +209,18 @@
                                     <h3 class="text-xs font-bold text-white">${w.title}</h3>
                                     <span class="text-[10px] text-zinc-500 uppercase font-mono tracking-wider">${w.category} • ${w.format.toUpperCase()}</span>
                                 </div>
-                                <span class="text-xs font-black text-indigo-400">₹10</span>
+                                <span class="text-xs font-black text-indigo-400">₹${w.price}</span>
                             </div>
 
                             ${unlocked ? `
-                                <a href="${w.img}" download="${w.title}-4K.jpg" target="_blank" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs py-2.5 rounded-xl transition flex items-center justify-center space-x-2">
-                                    <i class="fa-solid fa-download"></i>
-                                    <span>Download 4K Image</span>
-                                </a>
+                                <button onclick="downloadWallpaper('${w.isLive ? w.videoUrl : w.img}', '${w.title}.${w.isLive ? 'mp4' : 'jpg'}')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-2.5 rounded-xl transition flex items-center justify-center space-x-2">
+                                    <i class="fa-solid fa-floppy-disk"></i>
+                                    <span>Save to Gallery (${w.isLive ? 'Video' : '4K'})</span>
+                                </button>
                             ` : `
                                 <button onclick="openPayModal(${w.id})" class="w-full bg-zinc-800 hover:bg-indigo-600 text-white font-bold text-xs py-2.5 rounded-xl transition border border-zinc-700 flex items-center justify-center space-x-2">
                                     <i class="fa-solid fa-unlock"></i>
-                                    <span>Unlock 4K for ₹10</span>
+                                    <span>Unlock for ₹${w.price}</span>
                                 </button>
                             `}
                         </div>
@@ -201,7 +232,7 @@
         function filterCategory(cat) {
             currentCategory = cat;
             document.querySelectorAll('[id^="cat"]').forEach(btn => btn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800 transition');
-            document.getElementById(`cat${cat.charAt(0).toUpperCase() + cat.slice(1)}`).className = 'px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white transition';
+            document.getElementById(`cat${cat.charAt(0).toUpperCase() + cat.slice(1)}`).className = cat === 'live' ? 'px-4 py-2 rounded-xl text-xs font-bold bg-amber-500 text-black transition' : 'px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white transition';
             renderGallery();
         }
 
@@ -214,49 +245,4 @@
 
         function openPayModal(id) {
             activeWallId = id;
-            const wall = wallpapers.find(w => w.id === id);
-            document.getElementById('modalWallTitle').innerText = wall.title;
-
-            const upiUri = `upi://pay?pa=${UPI_ID}&pn=WallPaperVault&am=10&cu=INR`;
-            document.getElementById('upiPayBtn').href = upiUri;
-            document.getElementById('upiQrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiUri)}`;
-
-            document.getElementById('payModal').classList.remove('hidden');
-        }
-
-        function closePayModal() {
-            document.getElementById('payModal').classList.add('hidden');
-            document.getElementById('utrInput').value = '';
-            document.getElementById('passcodeInput').value = '';
-        }
-
-        function sendUtrToWhatsapp() {
-            const utr = document.getElementById('utrInput').value.trim();
-            if (utr.length < 6) {
-                alert("Please enter your UTR/Transaction ID first.");
-                return;
-            }
-            const wall = wallpapers.find(w => w.id === activeWallId);
-            const msg = `Hi! I paid ₹10 for wallpaper: "${wall.title}". My UTR is: ${utr}. Please send me the unlock passcode.`;
-            const waUrl = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(msg)}`;
-            window.open(waUrl, '_blank');
-        }
-
-        function verifyPasscode() {
-            const enteredCode = document.getElementById('passcodeInput').value.trim().toUpperCase();
-            const currentWall = wallpapers.find(w => w.id === activeWallId);
-
-            if (enteredCode === currentWall.code) {
-                localStorage.setItem(`unlocked_wall_${activeWallId}`, 'true');
-                closePayModal();
-                renderGallery();
-                alert("🎉 Passcode Verified! 4K Wallpaper Unlocked!");
-            } else {
-                alert("❌ Invalid Passcode for this wallpaper. Please check your WhatsApp message.");
-            }
-        }
-
-        renderGallery();
-    </script>
-</body>
-</html>
+            const wall = wallpape
