@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -111,18 +112,17 @@
         let currentCategory = 'all';
         let currentFormat = 'all';
 
-        // Catalog: Wallpapers with Unique Unlock Codes
+        // Catalog: Full 27 High-Resolution Wallpapers
         const wallpapers = [
-            // --- NEW ANIME GIRL WALLPAPERS (PHONE 4K - ₹10) ---
+            // --- Anime Girl Phone 4K ---
             { id: 30, title: "Cyberpunk Anime Girl 4K", category: "girls", format: "phone", price: 10, code: "ANIMEG1", img: "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1080&q=80" },
             { id: 31, title: "Cherry Blossom Anime Girl 4K", category: "girls", format: "phone", price: 10, code: "ANIMEG2", img: "https://images.unsplash.com/photo-1528164344705-475426879e0d?auto=format&fit=crop&w=1080&q=80" },
 
-            // --- NEW ANIME BOY WALLPAPERS (PHONE 4K - ₹10) ---
+            // --- Anime Boy Phone 4K ---
             { id: 32, title: "Neon Samurai Anime Boy 4K", category: "boys", format: "phone", price: 10, code: "ANIMEB1", img: "https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=1080&q=80" },
             { id: 33, title: "Shadow Ninja Anime Boy 4K", category: "boys", format: "phone", price: 10, code: "ANIMEB2", img: "https://images.unsplash.com/photo-1514565131-fce0801e5785?auto=format&fit=crop&w=1080&q=80" },
 
-            // --- Existing Catalog ---
-            { id: 29, title: "Aesthetic Girl Edition", category: "girls", format: "phone", price: 10, code: "GIRLVAL", img: "https://i.ibb.co/xtJg3FzY/wallpaper.jpg" },
+            // --- Full Catalog Restored ---
             { id: 1, title: "BMW M4 Competition Dark", category: "boys", format: "pc", price: 10, code: "M4DARK", img: "https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=1200&q=80" },
             { id: 2, title: "Neon Cyberpunk Girl", category: "girls", format: "phone", price: 10, code: "NEONGIRL", img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80" },
             { id: 3, title: "BMW M5 Supercar Night", category: "boys", format: "phone", price: 10, code: "M5NIGHT", img: "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?auto=format&fit=crop&w=800&q=80" },
@@ -148,7 +148,8 @@
             { id: 23, title: "BMW M4 GT3 Track Edition", category: "boys", format: "phone", price: 10, code: "M4TRACK", img: "https://images.unsplash.com/photo-1555215695-3004980ad54e?auto=format&fit=crop&w=800&q=80" },
             { id: 24, title: "Pastel Galaxy Aesthetic", category: "girls", format: "phone", price: 10, code: "PASTELGAL", img: "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=800&q=80" },
             { id: 25, title: "Neon Gaming Desk Setup", category: "boys", format: "pc", price: 10, code: "NEONDESK", img: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80" },
-            { id: 26, title: "Aesthetic Blossom Night", category: "girls", format: "pc", price: 10, code: "BLOSSOM", img: "https://images.unsplash.com/photo-1528164344705-475426879e0d?auto=format&fit=crop&w=1200&q=80" }
+            { id: 26, title: "Aesthetic Blossom Night", category: "girls", format: "pc", price: 10, code: "BLOSSOM", img: "https://images.unsplash.com/photo-1528164344705-475426879e0d?auto=format&fit=crop&w=1200&q=80" },
+            { id: 29, title: "Aesthetic Girl Edition", category: "girls", format: "phone", price: 10, code: "GIRLVAL", img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=1080&q=80" }
         ];
 
         function isUnlocked(id) {
@@ -157,18 +158,25 @@
 
         function renderGallery() {
             const grid = document.getElementById('wallpaperGrid');
+            if (!grid) return;
+
             const filtered = wallpapers.filter(w => {
                 const matchCat = currentCategory === 'all' || w.category === currentCategory;
                 const matchFmt = currentFormat === 'all' || w.format === currentFormat;
                 return matchCat && matchFmt;
             });
 
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div class="col-span-full text-center text-zinc-500 py-12 text-sm">No wallpapers found in this category.</div>';
+                return;
+            }
+
             grid.innerHTML = filtered.map(w => {
                 const unlocked = isUnlocked(w.id);
                 return `
                     <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden group flex flex-col justify-between">
                         <div class="relative ${w.format === 'phone' ? 'aspect-[9/16]' : 'aspect-video'} bg-zinc-950 overflow-hidden">
-                            <img src="${w.img}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <img src="${w.img}" alt="${w.title}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                             ${!unlocked ? `
                                 <div class="absolute inset-0 watermark-overlay flex flex-col items-center justify-center p-4 text-center">
                                     <span class="bg-black/70 backdrop-blur-md text-white font-extrabold text-[10px] px-3 py-1 rounded-full border border-white/20 uppercase tracking-widest mb-1">
@@ -211,20 +219,24 @@
         function filterCategory(cat) {
             currentCategory = cat;
             document.querySelectorAll('[id^="cat"]').forEach(btn => btn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800 transition');
-            document.getElementById(`cat${cat.charAt(0).toUpperCase() + cat.slice(1)}`).className = 'px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white transition';
+            const targetBtn = document.getElementById(`cat${cat.charAt(0).toUpperCase() + cat.slice(1)}`);
+            if (targetBtn) targetBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white transition';
             renderGallery();
         }
 
         function filterFormat(fmt) {
             currentFormat = fmt;
             document.querySelectorAll('[id^="fmt"]').forEach(btn => btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-400 hover:text-white');
-            document.getElementById(`fmt${fmt.charAt(0).toUpperCase() + fmt.slice(1)}`).className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-zinc-800 text-white';
+            const targetBtn = document.getElementById(`fmt${fmt.charAt(0).toUpperCase() + fmt.slice(1)}`);
+            if (targetBtn) targetBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-zinc-800 text-white';
             renderGallery();
         }
 
         function openPayModal(id) {
             activeWallId = id;
             const wall = wallpapers.find(w => w.id === id);
+            if (!wall) return;
+
             document.getElementById('modalWallTitle').innerText = wall.title;
 
             const upiUri = `upi://pay?pa=${UPI_ID}&pn=WallPaperVault&am=${wall.price}&cu=INR`;
@@ -241,11 +253,4 @@
         }
 
         function sendUtrToWhatsapp() {
-            const utr = document.getElementById('utrInput').value.trim();
-            if (utr.length < 6) {
-                alert("Please enter your UTR/Transaction ID first.");
-                return;
-            }
-            const wall = wallpapers.find(w => w.id === activeWallId);
-            const msg = `Hi! I paid ₹${wall.price} for wallpaper: "${wall.title}". My UTR is: ${utr}. Please send me the unlock passcode.`;
-            const waUrl = `https://wa.me/${P
+            const utr =
