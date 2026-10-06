@@ -111,8 +111,8 @@
         let currentCategory = 'all';
         let currentFormat = 'all';
 
-        // Original Wallpaper Set Restored with Direct Working Unsplash CDN Links
         const wallpapers = [
+            // Original Wallpapers Set
             { id: 30, title: "Cyberpunk Anime Girl 4K", category: "girls", format: "phone", price: 10, code: "ANIMEG1", img: "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1080&q=80" },
             { id: 31, title: "Cherry Blossom Anime Girl 4K", category: "girls", format: "phone", price: 10, code: "ANIMEG2", img: "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1080&q=80" },
             { id: 32, title: "Neon Samurai Anime Boy 4K", category: "boys", format: "phone", price: 10, code: "ANIMEB1", img: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=1080&q=80" },
@@ -153,7 +153,19 @@
             { id: 40, title: "Anime Girl Rainy Cafe", category: "girls", format: "pc", price: 10, code: "RAINCAFE", img: "https://images.unsplash.com/photo-1515260268569-9271009adfdb?auto=format&fit=crop&w=1920&q=80" },
             { id: 41, title: "Minimalist Pastel Moonlight", category: "girls", format: "phone", price: 10, code: "PASTELMOON", img: "https://images.unsplash.com/photo-1495616811223-4d98c6e9c869?auto=format&fit=crop&w=1080&q=80" },
             { id: 42, title: "Japanese Cherry Blossom Alley", category: "girls", format: "pc", price: 10, code: "SAKURAALLEY", img: "https://images.unsplash.com/photo-1528164344705-47542687990d?auto=format&fit=crop&w=1920&q=80" },
-            { id: 43, title: "Dreamy Cosmic Galaxy", category: "girls", format: "phone", price: 10, code: "COSMIC4K", img: "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=1080&q=80" }
+            { id: 43, title: "Dreamy Cosmic Galaxy", category: "girls", format: "phone", price: 10, code: "COSMIC4K", img: "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=1080&q=80" },
+
+            // 10 New Anime Wallpapers Added
+            { id: 44, title: "Goku Ultra Instinct 4K", category: "boys", format: "phone", price: 10, code: "GOKU4K", img: "https://images.unsplash.com/photo-1578632767115-351597cf2477?auto=format&fit=crop&w=1080&q=80" },
+            { id: 45, title: "Itachi Uchiha Crimson Moon", category: "boys", format: "phone", price: 10, code: "ITACHI4K", img: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=1080&q=80" },
+            { id: 46, title: "Cyberpunk Neo Tokyo Street", category: "boys", format: "pc", price: 10, code: "NEOTOOKYO", img: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1920&q=80" },
+            { id: 47, title: "Your Name Starry Comet", category: "girls", format: "pc", price: 10, code: "COMET4K", img: "https://images.unsplash.com/photo-1534447677768-be436bb09401?auto=format&fit=crop&w=1920&q=80" },
+            { id: 48, title: "Luffy Gear 5 Sun God", category: "boys", format: "phone", price: 10, code: "GEAR54K", img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=1080&q=80" },
+            { id: 49, title: "Demon Slayer Tanjiro Flame", category: "boys", format: "phone", price: 10, code: "TANJIRO4K", img: "https://images.unsplash.com/photo-1563089145-599997674d42?auto=format&fit=crop&w=1080&q=80" },
+            { id: 50, title: "Solo Leveling Shadow Monarch", category: "boys", format: "phone", price: 10, code: "SOLO4K", img: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?auto=format&fit=crop&w=1080&q=80" },
+            { id: 51, title: "Attack on Titan Eren Yeager", category: "boys", format: "pc", price: 10, code: "EREN4K", img: "https://images.unsplash.com/photo-1614036417651-efe5912149d8?auto=format&fit=crop&w=1920&q=80" },
+            { id: 52, title: "Jujutsu Kaisen Gojo Satoru", category: "boys", format: "phone", price: 10, code: "GOJO4K", img: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?auto=format&fit=crop&w=1080&q=80" },
+            { id: 53, title: "Cherry Blossom Anime Train", category: "girls", format: "pc", price: 10, code: "TRAIN4K", img: "https://images.unsplash.com/photo-1528164344705-47542687990d?auto=format&fit=crop&w=1920&q=80" }
         ];
 
         function isUnlocked(id) {
@@ -210,8 +222,8 @@
                                 </a>
                             ` : `
                                 <button onclick="openPayModal(${w.id})" class="w-full bg-zinc-800 hover:bg-indigo-600 text-white font-bold text-xs py-2.5 rounded-xl transition border border-zinc-700 flex items-center justify-center space-x-2">
-                                    <i class="fa-solid fa-unlock"></i>
-                                    <span>Unlock 4K for ₹${w.price}</span>
+                                    <i class="fa-solid fa-lock text-indigo-400"></i>
+                                    <span>Unlock Full Resolution</span>
                                 </button>
                             `}
                         </div>
@@ -222,69 +234,81 @@
 
         function filterCategory(cat) {
             currentCategory = cat;
-            document.querySelectorAll('[id^="cat"]').forEach(btn => btn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800 transition');
-            const targetBtn = document.getElementById(`cat${cat.charAt(0).toUpperCase() + cat.slice(1)}`);
-            if (targetBtn) targetBtn.className = 'px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white transition';
+            ['catAll', 'catBoys', 'catGirls'].forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) {
+                    btn.className = "px-4 py-2 rounded-xl text-xs font-bold bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800 transition";
+                }
+            });
+            const activeId = cat === 'all' ? 'catAll' : cat === 'boys' ? 'catBoys' : 'catGirls';
+            const activeBtn = document.getElementById(activeId);
+            if (activeBtn) {
+                activeBtn.className = "px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white transition";
+            }
             renderGallery();
         }
 
         function filterFormat(fmt) {
             currentFormat = fmt;
-            document.querySelectorAll('[id^="fmt"]').forEach(btn => btn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-400 hover:text-white');
-            const targetBtn = document.getElementById(`fmt${fmt.charAt(0).toUpperCase() + fmt.slice(1)}`);
-            if (targetBtn) targetBtn.className = 'px-3 py-1.5 rounded-lg text-xs font-bold bg-zinc-800 text-white';
+            ['fmtAll', 'fmtPhone', 'fmtPc'].forEach(id => {
+                const btn = document.getElementById(id);
+                if (btn) {
+                    btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-400 hover:text-white";
+                }
+            });
+            const activeId = fmt === 'all' ? 'fmtAll' : fmt === 'phone' ? 'fmtPhone' : 'fmtPc';
+            const activeBtn = document.getElementById(activeId);
+            if (activeBtn) {
+                activeBtn.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-zinc-800 text-white";
+            }
             renderGallery();
         }
 
         function openPayModal(id) {
-            activeWallId = id;
             const wall = wallpapers.find(w => w.id === id);
             if (!wall) return;
+            activeWallId = id;
 
             document.getElementById('modalWallTitle').innerText = wall.title;
-
-            const upiUri = `upi://pay?pa=${UPI_ID}&pn=WallPaperVault&am=${wall.price}&cu=INR`;
-            document.getElementById('upiPayBtn').href = upiUri;
-            document.getElementById('upiQrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiUri)}`;
+            const upiUrl = `upi://pay?pa=${UPI_ID}&pn=WallPaperVault&am=${wall.price}&cu=INR&tn=Unlock_${wall.code}`;
+            
+            document.getElementById('upiQrImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiUrl)}`;
+            document.getElementById('upiPayBtn').href = upiUrl;
 
             document.getElementById('payModal').classList.remove('hidden');
         }
 
         function closePayModal() {
             document.getElementById('payModal').classList.add('hidden');
-            document.getElementById('utrInput').value = '';
-            document.getElementById('passcodeInput').value = '';
+            activeWallId = null;
         }
 
         function sendUtrToWhatsapp() {
             const utr = document.getElementById('utrInput').value.trim();
-            if (utr.length < 6) {
-                alert("Please enter your UTR/Transaction ID first.");
+            if (utr.length !== 12 || isNaN(utr)) {
+                alert("Please enter a valid 12-digit UTR number.");
                 return;
             }
             const wall = wallpapers.find(w => w.id === activeWallId);
-            const msg = `Hi! I paid ₹${wall.price} for wallpaper: "${wall.title}". My UTR is: ${utr}. Please send me the unlock passcode.`;
-            const waUrl = `https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(msg)}`;
-            window.open(waUrl, '_blank');
+            const msg = `Hi! I paid ₹${wall.price} for wallpaper '${wall.title}' (Code: ${wall.code}). My UTR is ${utr}. Please send me the unlock passcode.`;
+            window.open(`https://wa.me/${PHONE_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
         }
 
         function verifyPasscode() {
             const enteredCode = document.getElementById('passcodeInput').value.trim().toUpperCase();
-            const currentWall = wallpapers.find(w => w.id === activeWallId);
-
-            if (currentWall && enteredCode === currentWall.code) {
-                localStorage.setItem(`unlocked_wall_${activeWallId}`, 'true');
+            const wall = wallpapers.find(w => w.id === activeWallId);
+            if (wall && enteredCode === wall.code) {
+                localStorage.setItem(`unlocked_wall_${wall.id}`, 'true');
+                alert("Success! Wallpaper unlocked.");
                 closePayModal();
                 renderGallery();
-                alert("🎉 Passcode Verified! 4K Wallpaper Unlocked!");
             } else {
-                alert("❌ Invalid Passcode for this wallpaper. Please check your WhatsApp message.");
+                alert("Incorrect passcode. Please check the code sent on WhatsApp.");
             }
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
-            renderGallery();
-        });
+        // Initialize gallery on load
+        renderGallery();
     </script>
 </body>
 </html>
