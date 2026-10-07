@@ -6,6 +6,7 @@
     <title>WallPaperVault | 4K Ultra HD Wallpapers</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
         .watermark-overlay {
             background: repeating-linear-gradient(
@@ -20,6 +21,7 @@
 </head>
 <body class="bg-zinc-950 text-zinc-100 font-sans min-h-screen">
 
+    <!-- Navigation Header -->
     <nav class="flex items-center justify-between px-6 py-4 bg-zinc-900 border-b border-zinc-800 sticky top-0 z-40">
         <div class="flex items-center space-x-2">
             <i class="fa-solid fa-image text-indigo-500 text-2xl"></i>
@@ -30,8 +32,27 @@
         </div>
     </nav>
 
+    <!-- Main Content Container -->
     <div class="max-w-7xl mx-auto p-6 space-y-6">
 
+        <!-- ADSTERRA SLOT 2: Top Banner (728x90) -->
+        <div class="w-full bg-zinc-900/60 border border-zinc-800/80 rounded-2xl p-3 text-center min-h-[90px] flex flex-col items-center justify-center overflow-hidden">
+            <span class="text-[9px] font-mono text-zinc-600 uppercase tracking-widest mb-1">Sponsored</span>
+            
+            <!-- LIVE ADSTERRA 728x90 BANNER CODE -->
+            <script type="text/javascript">
+                atOptions = {
+                    'key' : 'f103250c47c980b6d62bf87fc131febf',
+                    'format' : 'iframe',
+                    'height' : 90,
+                    'width' : 728,
+                    'params' : {}
+                };
+            </script>
+            <script type="text/javascript" src="//www.highperformanceformat.com/f103250c47c980b6d62bf87fc131febf/invoke.js"></script>
+        </div>
+
+        <!-- Category & Format Filter Tabs -->
         <div class="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-800 pb-4">
             <div class="flex flex-wrap items-center gap-2">
                 <button onclick="filterCategory('all')" id="catAll" class="px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white transition">All Wallpapers</button>
@@ -46,11 +67,18 @@
             </div>
         </div>
 
+        <!-- Wallpaper Gallery Grid -->
         <div id="wallpaperGrid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+
+        <!-- ADSTERRA SLOT 3: Native Banner Container -->
+        <div class="w-full bg-zinc-900/60 border border-zinc-800/80 rounded-2xl p-4 text-center min-h-[120px] flex flex-col items-center justify-center my-8">
+            <span class="text-[9px] font-mono text-zinc-600 uppercase tracking-widest mb-1">Recommended Content</span>
+        </div>
     </div>
 
+    <!-- Payment Modal -->
     <div id="payModal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-zinc-900 border border-zinc-800 rounded-3xl max-w-sm w-full p-6 text-center space-y-5 shadow-2xl">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-3xl max-w-sm w-full p-6 text-center space-y-5 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div class="space-y-1">
                 <div class="inline-flex items-center space-x-1 text-indigo-400 bg-indigo-500/10 px-3 py-1 rounded-full text-xs font-bold border border-indigo-500/20">
                     <i class="fa-solid fa-lock text-[10px]"></i>
@@ -60,6 +88,7 @@
                 <p class="text-xs text-zinc-400">Pay ₹10 via UPI to unlock high-res download</p>
             </div>
 
+            <!-- UPI Payment Details -->
             <div class="bg-zinc-950 p-4 rounded-2xl border border-zinc-800 space-y-3 flex flex-col items-center">
                 <img id="upiQrImg" src="" alt="UPI QR" class="w-40 h-40 bg-white p-2 rounded-xl">
                 
@@ -74,6 +103,7 @@
                 </a>
             </div>
 
+            <!-- Verification Section -->
             <div class="space-y-3 text-left bg-zinc-950 p-4 rounded-2xl border border-zinc-800">
                 <span class="text-[11px] text-zinc-300 font-bold block">2. Verify Payment:</span>
                 <input type="text" id="utrInput" maxlength="12" placeholder="Enter 12-digit UTR number" class="w-full bg-zinc-900 border border-zinc-800 text-xs text-white p-3 rounded-xl focus:outline-none focus:border-indigo-500 font-mono">
@@ -104,62 +134,28 @@
         let currentCategory = 'all';
         let currentFormat = 'all';
 
-        // 53 Wallpapers with robust, reliable image URLs
-        const wallpapers = [
-            { id: 1, title: "BMW M4 Competition Dark", category: "boys", format: "pc", price: 10, code: "M4DARK", img: "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=1200&auto=format&fit=crop&q=80" },
-            { id: 2, title: "Neon Cyberpunk Girl", category: "girls", format: "phone", price: 10, code: "NEONGIRL", img: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&auto=format&fit=crop&q=80" },
-            { id: 3, title: "BMW M5 Supercar Night", category: "boys", format: "phone", price: 10, code: "M5NIGHT", img: "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=800&auto=format&fit=crop&q=80" },
-            { id: 4, title: "Minimalist Pastel Clouds", category: "girls", format: "pc", price: 10, code: "PASTEL4K", img: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=1200&auto=format&fit=crop&q=80" },
-            { id: 5, title: "Cyberpunk Gaming Rig", category: "boys", format: "pc", price: 10, code: "RIG4K", img: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1200&auto=format&fit=crop&q=80" },
-            { id: 6, title: "Aesthetic Anime Sunset", category: "girls", format: "phone", price: 10, code: "SUNSET4K", img: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80" },
-            { id: 7, title: "BMW M5 CS Green Beast", category: "boys", format: "phone", price: 10, code: "M5GREEN", img: "https://images.unsplash.com/photo-1603584173870-7f23fdae1b7a?w=800&auto=format&fit=crop&q=80" },
-            { id: 8, title: "Soft Pastel Cloudscape", category: "girls", format: "phone", price: 10, code: "CLOUD4K", img: "https://images.unsplash.com/photo-1517685352821-92cf88aee5a5?w=800&auto=format&fit=crop&q=80" },
-            { id: 9, title: "BMW M4 Drift Smoke 4K", category: "boys", format: "pc", price: 10, code: "M4DRIFT", img: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=1200&auto=format&fit=crop&q=80" },
-            { id: 10, title: "Cozy Lofi Room Aesthetic", category: "girls", format: "pc", price: 10, code: "LOFIROOM", img: "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=1200&auto=format&fit=crop&q=80" },
-            { id: 11, title: "Cyberpunk Neon Samurai", category: "boys", format: "phone", price: 10, code: "SAMURAI", img: "https://images.unsplash.com/photo-1563089145-599997674d42?w=800&auto=format&fit=crop&q=80" },
-            { id: 12, title: "Sakura Anime Street 4K", category: "girls", format: "phone", price: 10, code: "SAKURA4K", img: "https://images.unsplash.com/photo-1528164344705-47542687990d?w=800&auto=format&fit=crop&q=80" },
-            { id: 13, title: "Supercar Sunset Highway", category: "boys", format: "pc", price: 10, code: "SUPERCAR", img: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1200&auto=format&fit=crop&q=80" },
-            { id: 14, title: "Celestial Galaxy & Moon", category: "girls", format: "pc", price: 10, code: "GALAXY4K", img: "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?w=1200&auto=format&fit=crop&q=80" },
-            { id: 15, title: "Futuristic Neon Setup", category: "boys", format: "phone", price: 10, code: "NEONSETUP", img: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&auto=format&fit=crop&q=80" },
-            { id: 16, title: "Cyberpunk Girl Neon Rain", category: "girls", format: "pc", price: 10, code: "NEONRAIN", img: "https://images.unsplash.com/photo-1515260268569-9271009adfdb?w=1200&auto=format&fit=crop&q=80" },
-            { id: 17, title: "BMW M4 Competition Red", category: "boys", format: "pc", price: 10, code: "M4RED4K", img: "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=1200&auto=format&fit=crop&q=80" },
-            { id: 18, title: "Aesthetic Anime Rain Girl", category: "girls", format: "phone", price: 10, code: "RAINGIRL", img: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=800&auto=format&fit=crop&q=80" },
-            { id: 19, title: "BMW M5 CS Frozen Green", category: "boys", format: "pc", price: 10, code: "M5FROZEN", img: "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=1200&auto=format&fit=crop&q=80" },
-            { id: 20, title: "Minimalist Aesthetic Sunset", category: "girls", format: "phone", price: 10, code: "MINISUN", img: "https://images.unsplash.com/photo-1495616811223-4d98c6e9c869?w=800&auto=format&fit=crop&q=80" },
-            { id: 21, title: "Cyberpunk City Lights 4K", category: "boys", format: "phone", price: 10, code: "CYBERCITY", img: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?w=800&auto=format&fit=crop&q=80" },
-            { id: 22, title: "Cozy Anime Window View", category: "girls", format: "pc", price: 10, code: "ANIMEWIN", img: "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=1200&auto=format&fit=crop&q=80" },
-            { id: 23, title: "BMW M4 GT3 Track Edition", category: "boys", format: "phone", price: 10, code: "M4TRACK", img: "https://images.unsplash.com/photo-1580273916550-e323be2ae537?w=800&auto=format&fit=crop&q=80" },
-            { id: 24, title: "Pastel Galaxy Aesthetic", category: "girls", format: "phone", price: 10, code: "PASTELGAL", img: "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?w=800&auto=format&fit=crop&q=80" },
-            { id: 25, title: "Neon Gaming Desk Setup", category: "boys", format: "pc", price: 10, code: "NEONDESK", img: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1200&auto=format&fit=crop&q=80" },
-            { id: 26, title: "Aesthetic Blossom Night", category: "girls", format: "pc", price: 10, code: "BLOSSOM", img: "https://images.unsplash.com/photo-1528164344705-47542687990d?w=1200&auto=format&fit=crop&q=80" },
-            { id: 27, title: "Supercar Highway Night Drive", category: "boys", format: "pc", price: 10, code: "NIGHTDRIVE", img: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1200&auto=format&fit=crop&q=80" },
-            { id: 28, title: "Celestial Dream Sky 4K", category: "girls", format: "phone", price: 10, code: "DREAMSKY", img: "https://images.unsplash.com/photo-1517685352821-92cf88aee5a5?w=800&auto=format&fit=crop&q=80" },
-            { id: 29, title: "Aesthetic Girl Edition", category: "girls", format: "phone", price: 10, code: "GIRLVAL", img: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&auto=format&fit=crop&q=80" },
-            { id: 30, title: "Cyberpunk Anime Girl 4K", category: "girls", format: "phone", price: 10, code: "ANIMEG1", img: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&auto=format&fit=crop&q=80" },
-            { id: 31, title: "Cherry Blossom Anime Girl 4K", category: "girls", format: "phone", price: 10, code: "ANIMEG2", img: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=800&auto=format&fit=crop&q=80" },
-            { id: 32, title: "Neon Samurai Anime Boy 4K", category: "boys", format: "phone", price: 10, code: "ANIMEB1", img: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=800&auto=format&fit=crop&q=80" },
-            { id: 33, title: "Shadow Ninja Anime Boy 4K", category: "boys", format: "phone", price: 10, code: "ANIMEB2", img: "https://images.unsplash.com/photo-1563089145-599997674d42?w=800&auto=format&fit=crop&q=80" },
-            { id: 34, title: "BMW M4 CSL Matte Black", category: "boys", format: "pc", price: 10, code: "M4CSL4K", img: "https://images.unsplash.com/photo-1555215695-3004980ad54e?w=1200&auto=format&fit=crop&q=80" },
-            { id: 35, title: "Neon Cyber Warrior", category: "boys", format: "phone", price: 10, code: "CYBERWAR", img: "https://images.unsplash.com/photo-1563089145-599997674d42?w=800&auto=format&fit=crop&q=80" },
-            { id: 36, title: "Retro Arcade Vaporwave", category: "boys", format: "pc", price: 10, code: "VAPORWAVE", img: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1200&auto=format&fit=crop&q=80" },
-            { id: 37, title: "BMW M5 Competition Drift", category: "boys", format: "phone", price: 10, code: "M5DRIFT", img: "https://images.unsplash.com/photo-1617814076367-b759c7d7e738?w=800&auto=format&fit=crop&q=80" },
-            { id: 38, title: "Hypercar Synthwave Night", category: "boys", format: "pc", price: 10, code: "SYNTHCAR", img: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=1200&auto=format&fit=crop&q=80" },
-            { id: 39, title: "Aesthetic Lavender Sky", category: "girls", format: "phone", price: 10, code: "LAVENDER", img: "https://images.unsplash.com/photo-1517685352821-92cf88aee5a5?w=800&auto=format&fit=crop&q=80" },
-            { id: 40, title: "Anime Girl Rainy Cafe", category: "girls", format: "pc", price: 10, code: "RAINCAFE", img: "https://images.unsplash.com/photo-1515260268569-9271009adfdb?w=1200&auto=format&fit=crop&q=80" },
-            { id: 41, title: "Minimalist Pastel Moonlight", category: "girls", format: "phone", price: 10, code: "PASTELMOON", img: "https://images.unsplash.com/photo-1495616811223-4d98c6e9c869?w=800&auto=format&fit=crop&q=80" },
-            { id: 42, title: "Japanese Cherry Blossom Alley", category: "girls", format: "pc", price: 10, code: "SAKURAALLEY", img: "https://images.unsplash.com/photo-1528164344705-47542687990d?w=1200&auto=format&fit=crop&q=80" },
-            { id: 43, title: "Dreamy Cosmic Galaxy", category: "girls", format: "phone", price: 10, code: "COSMIC4K", img: "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?w=800&auto=format&fit=crop&q=80" },
-            { id: 44, title: "Goku Ultra Instinct 4K", category: "boys", format: "phone", price: 10, code: "GOKU4K", img: "https://images.unsplash.com/photo-1578632767115-351597cf2477?w=800&auto=format&fit=crop&q=80" },
-            { id: 45, title: "Itachi Uchiha Crimson Moon", category: "boys", format: "phone", price: 10, code: "ITACHI4K", img: "https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=800&auto=format&fit=crop&q=80" },
-            { id: 46, title: "Cyberpunk Neo Tokyo Street", category: "boys", format: "pc", price: 10, code: "NEOTOOKYO", img: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=1200&auto=format&fit=crop&q=80" },
-            { id: 47, title: "Your Name Starry Comet", category: "girls", format: "pc", price: 10, code: "COMET4K", img: "https://images.unsplash.com/photo-1534447677768-be436bb09401?w=1200&auto=format&fit=crop&q=80" },
-            { id: 48, title: "Luffy Gear 5 Sun God", category: "boys", format: "phone", price: 10, code: "GEAR54K", img: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80" },
-            { id: 49, title: "Demon Slayer Tanjiro Flame", category: "boys", format: "phone", price: 10, code: "TANJIRO4K", img: "https://images.unsplash.com/photo-1563089145-599997674d42?w=800&auto=format&fit=crop&q=80" },
-            { id: 50, title: "Solo Leveling Shadow Monarch", category: "boys", format: "phone", price: 10, code: "SOLO4K", img: "https://images.unsplash.com/photo-1550684848-fac1c5b4e853?w=800&auto=format&fit=crop&q=80" },
-            { id: 51, title: "Attack on Titan Eren Yeager", category: "boys", format: "pc", price: 10, code: "EREN4K", img: "https://images.unsplash.com/photo-1614036417651-efe5912149d8?w=1200&auto=format&fit=crop&q=80" },
-            { id: 52, title: "Jujutsu Kaisen Gojo Satoru", category: "boys", format: "phone", price: 10, code: "GOJO4K", img: "https://images.unsplash.com/photo-1579783902614-a3fb3927b675?w=800&auto=format&fit=crop&q=80" },
-            { id: 53, title: "Cherry Blossom Anime Train", category: "girls", format: "pc", price: 10, code: "TRAIN4K", img: "https://images.unsplash.com/photo-1528164344705-47542687990d?w=1200&auto=format&fit=crop&q=80" }
-        ];
+        // Auto-generate array of 53 wallpapers using reliable Unsplash HD images
+        const wallpapers = Array.from({ length: 53 }, (_, i) => {
+            const id = i + 1;
+            const isBoy = id % 2 !== 0;
+            const isPhone = id % 3 === 0;
+            
+            const category = isBoy ? "boys" : "girls";
+            const format = isPhone ? "phone" : "pc";
+            const code = `WALL4K_${id}`;
+            const price = 10;
+            
+            // Image collection topics matching categories
+            const term = isBoy ? 'supercar,gaming,cyberpunk' : 'aesthetic,anime,nature';
+            const img = `https://source.unsplash.com/featured/${isPhone ? '1080x1920' : '1920x1080'}?${term}&sig=${id}`;
+
+            let title = `4K Ultra HD Wallpaper #${id}`;
+            if (id === 1) title = "BMW M4 Competition Dark";
+            if (id === 2) title = "Neon Cyberpunk Aesthetic";
+            if (id === 3) title = "BMW M5 Supercar Night";
+
+            return { id, title, category, format, price, code, img };
+        });
 
         function isUnlocked(id) {
             return localStorage.getItem(`unlocked_wall_${id}`) === 'true';
@@ -180,12 +176,13 @@
                 return;
             }
 
-            grid.innerHTML = filtered.map(w => {
+            let htmlOutput = '';
+            filtered.forEach((w) => {
                 const unlocked = isUnlocked(w.id);
-                return `
+                htmlOutput += `
                     <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden group flex flex-col justify-between">
                         <div class="relative ${w.format === 'phone' ? 'aspect-[9/16]' : 'aspect-video'} bg-zinc-950 overflow-hidden">
-                            <img src="${w.img}" alt="${w.title}" loading="lazy" onerror="this.onerror=null;this.src='https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80';" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <img src="${w.img}" alt="${w.title}" loading="lazy" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                             ${!unlocked ? `
                                 <div class="absolute inset-0 watermark-overlay flex flex-col items-center justify-center p-4 text-center">
                                     <span class="bg-black/70 backdrop-blur-md text-white font-extrabold text-[10px] px-3 py-1 rounded-full border border-white/20 uppercase tracking-widest mb-1">
@@ -222,38 +219,18 @@
                         </div>
                     </div>
                 `;
-            }).join('');
+            });
+
+            grid.innerHTML = htmlOutput;
         }
 
         function filterCategory(cat) {
             currentCategory = cat;
-            ['catAll', 'catBoys', 'catGirls'].forEach(id => {
-                const btn = document.getElementById(id);
-                if (btn) {
-                    btn.className = "px-4 py-2 rounded-xl text-xs font-bold bg-zinc-900 text-zinc-400 hover:text-white border border-zinc-800 transition";
-                }
-            });
-            const activeId = cat === 'all' ? 'catAll' : cat === 'boys' ? 'catBoys' : 'catGirls';
-            const activeBtn = document.getElementById(activeId);
-            if (activeBtn) {
-                activeBtn.className = "px-4 py-2 rounded-xl text-xs font-bold bg-indigo-600 text-white transition";
-            }
             renderGallery();
         }
 
         function filterFormat(fmt) {
             currentFormat = fmt;
-            ['fmtAll', 'fmtPhone', 'fmtPc'].forEach(id => {
-                const btn = document.getElementById(id);
-                if (btn) {
-                    btn.className = "px-3 py-1.5 rounded-lg text-xs font-bold text-zinc-400 hover:text-white";
-                }
-            });
-            const activeId = fmt === 'all' ? 'fmtAll' : fmt === 'phone' ? 'fmtPhone' : 'fmtPc';
-            const activeBtn = document.getElementById(activeId);
-            if (activeBtn) {
-                activeBtn.className = "px-3 py-1.5 rounded-lg text-xs font-bold bg-zinc-800 text-white";
-            }
             renderGallery();
         }
 
@@ -296,11 +273,10 @@
                 closePayModal();
                 renderGallery();
             } else {
-                alert("Incorrect passcode. Please check the code sent on WhatsApp.");
+                alert("Incorrect passcode.");
             }
         }
 
-        // Initialize gallery on load
         renderGallery();
     </script>
 </body>
