@@ -13,7 +13,7 @@
         }
 
         body {
-            background-color: #fafafa;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             color: #262626;
             display: flex;
             justify-content: center;
@@ -35,9 +35,9 @@
             display: flex;
             flex-direction: column;
             position: relative;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
             overflow: hidden;
-            border-radius: 12px;
+            border-radius: 16px;
         }
 
         @media (max-width: 480px) {
@@ -45,6 +45,7 @@
                 height: 100vh;
                 max-height: 100vh;
                 border-radius: 0;
+                box-shadow: none;
             }
         }
 
@@ -62,31 +63,41 @@
 
         .auth-container h1 {
             font-family: 'Brush Script MT', cursive, sans-serif;
-            font-size: 48px;
+            font-size: 52px;
             margin-bottom: 24px;
-            color: #0095f6;
+            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .auth-container input {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             margin-bottom: 12px;
             border: 1px solid #dbdbdb;
-            border-radius: 6px;
+            border-radius: 8px;
             background: #fafafa;
             font-size: 14px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .auth-container input:focus {
+            border-color: #0095f6;
         }
 
         .auth-container button {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             background: #0095f6;
             color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             font-weight: 600;
             cursor: pointer;
             margin-top: 6px;
+            box-shadow: 0 4px 12px rgba(0, 149, 246, 0.3);
+            transition: background 0.2s;
         }
 
         .auth-container button:hover {
@@ -99,16 +110,18 @@
             justify-content: space-between;
             align-items: center;
             padding: 12px 16px;
-            border-bottom: 1px solid #dbdbdb;
+            border-bottom: 1px solid #efefef;
             background: #fff;
-            height: 50px;
+            height: 56px;
         }
 
         header .logo {
             font-family: 'Brush Script MT', cursive, sans-serif;
-            font-size: 26px;
+            font-size: 28px;
             font-weight: bold;
-            color: #262626;
+            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         header .header-icons span {
@@ -128,9 +141,9 @@
         /* Stories Bar */
         .stories-bar {
             display: flex;
-            padding: 12px;
+            padding: 12px 16px;
             background: #fff;
-            border-bottom: 1px solid #dbdbdb;
+            border-bottom: 1px solid #efefef;
             overflow-x: auto;
             gap: 16px;
         }
@@ -174,13 +187,15 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
+            color: #262626;
         }
 
         /* Feed Posts */
         .post {
             background: #fff;
             margin-bottom: 16px;
-            border-bottom: 1px solid #dbdbdb;
+            border-top: 1px solid #efefef;
+            border-bottom: 1px solid #efefef;
         }
 
         .post-header {
@@ -203,6 +218,7 @@
             height: 32px;
             border-radius: 50%;
             object-fit: cover;
+            background: #efefef;
         }
 
         .post-media {
@@ -251,7 +267,7 @@
         }
 
         .post-comments-section {
-            padding: 0 16px 12px 16px;
+            padding: 0 16px 8px 16px;
         }
 
         .comment-item {
@@ -274,6 +290,7 @@
             border: none;
             outline: none;
             font-size: 13px;
+            background: transparent;
         }
 
         .comment-input-box button {
@@ -290,9 +307,9 @@
             bottom: 0;
             left: 0;
             width: 100%;
-            height: 50px;
+            height: 52px;
             background: #fff;
-            border-top: 1px solid #dbdbdb;
+            border-top: 1px solid #efefef;
             display: flex;
             justify-content: space-around;
             align-items: center;
@@ -302,6 +319,12 @@
         nav.bottom-nav span {
             font-size: 24px;
             cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.2s;
+        }
+
+        nav.bottom-nav span:hover {
+            opacity: 1;
         }
 
         /* Modals / Screens */
@@ -322,8 +345,9 @@
             justify-content: space-between;
             align-items: center;
             padding: 14px 16px;
-            border-bottom: 1px solid #dbdbdb;
+            border-bottom: 1px solid #efefef;
             font-weight: 600;
+            background: #fff;
         }
 
         .modal-header span {
@@ -335,6 +359,7 @@
             flex: 1;
             padding: 20px;
             overflow-y: auto;
+            background: #fafafa;
         }
 
         /* Reels View */
@@ -378,6 +403,7 @@
             gap: 12px;
             cursor: pointer;
             border-bottom: 1px solid #efefef;
+            background: #fff;
         }
 
         .chat-list-item img {
@@ -385,6 +411,7 @@
             height: 50px;
             border-radius: 50%;
             object-fit: cover;
+            background: #efefef;
         }
 
         /* Story Viewer Modal */
@@ -410,7 +437,7 @@
     <!-- AUTHENTICATION SCREEN -->
     <div id="auth-screen" class="auth-container">
         <h1>VibeGram</h1>
-        <p style="margin-bottom: 20px; color: #8e8e8e; font-size: 14px;">Log in with your phone number and username</p>
+        <p style="margin-bottom: 24px; color: #8e8e8e; font-size: 14px;">Log in with your phone number and username</p>
         <input type="text" id="auth-username" placeholder="Username">
         <input type="tel" id="auth-phone" placeholder="Mobile Number">
         <button onclick="handleLogin()">Log In / Sign Up</button>
@@ -449,14 +476,14 @@
             <span onclick="submitCreate()">Share</span>
         </div>
         <div class="modal-content">
-            <select id="create-type" style="width:100%; padding:10px; margin-bottom:15px; border-radius:6px; border:1px solid #dbdbdb;">
+            <select id="create-type" style="width:100%; padding:12px; margin-bottom:15px; border-radius:8px; border:1px solid #dbdbdb; background:#fff;">
                 <option value="post">Post (Photo/Video)</option>
                 <option value="reel">Reel (Video)</option>
                 <option value="story">Story (Photo/Video)</option>
             </select>
-            <label style="display:block; margin-bottom:8px; font-weight:600;">Select from Gallery:</label>
-            <input type="file" id="media-file-input" accept="image/*,video/*" style="margin-bottom:15px; width:100%;">
-            <textarea id="create-caption" placeholder="Write a caption..." style="width:100%; height:80px; padding:10px; border-radius:6px; border:1px solid #dbdbdb; resize:none;"></textarea>
+            <label style="display:block; margin-bottom:8px; font-weight:600; font-size:14px;">Select from Gallery:</label>
+            <input type="file" id="media-file-input" accept="image/*,video/*" style="margin-bottom:15px; width:100%; padding:8px; background:#fff; border:1px solid #dbdbdb; border-radius:8px;">
+            <textarea id="create-caption" placeholder="Write a caption..." style="width:100%; height:90px; padding:12px; border-radius:8px; border:1px solid #dbdbdb; resize:none; background:#fff;"></textarea>
         </div>
     </div>
 
@@ -492,7 +519,7 @@
             <span onclick="saveNote()">Post</span>
         </div>
         <div class="modal-content">
-            <input type="text" id="note-input" placeholder="Share what's on your mind..." maxlength="60" style="width:100%; padding:12px; border:1px solid #dbdbdb; border-radius:6px; margin-bottom:15px;">
+            <input type="text" id="note-input" placeholder="Share what's on your mind..." maxlength="60" style="width:100%; padding:14px; border:1px solid #dbdbdb; border-radius:8px; margin-bottom:15px; background:#fff;">
             <div id="notes-list"></div>
         </div>
     </div>
@@ -534,7 +561,6 @@
     window.onload = function() {
         cleanExpiredStories();
         if (currentUser) {
-            // Sync currentUser state with users list
             let found = users.find(u => u.username === currentUser.username);
             if(found) {
                 currentUser = found;
@@ -668,7 +694,6 @@
         renderStories();
 
         let postsDiv = document.getElementById('posts-feed');
-        // Users can see their own posts and posts from users they follow
         let visiblePosts = posts.filter(p => p.username === currentUser.username || (currentUser.following && currentUser.following.includes(p.username)));
 
         if(visiblePosts.length === 0) {
@@ -784,12 +809,12 @@
         otherUsers.forEach(u => {
             let isFollowing = currentUser.following && currentUser.following.includes(u.username);
             list.innerHTML += `
-                <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 0; border-bottom:1px solid #efefef;">
-                    <div style="display:flex; align-items:center; gap:10px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid #efefef;">
+                    <div style="display:flex; align-items:center; gap:12px;">
                         <img src="https://via.placeholder.com/40" style="border-radius:50%;">
                         <b>${u.username}</b>
                     </div>
-                    <button onclick="toggleFollow('${u.username}')" style="background:${isFollowing ? '#dbdbdb' : '#0095f6'}; color:${isFollowing ? '#262626' : '#fff'}; border:none; padding:6px 16px; border-radius:4px; font-weight:600; cursor:pointer;">
+                    <button onclick="toggleFollow('${u.username}')" style="background:${isFollowing ? '#dbdbdb' : '#0095f6'}; color:${isFollowing ? '#262626' : '#fff'}; border:none; padding:6px 16px; border-radius:6px; font-weight:600; cursor:pointer;">
                         ${isFollowing ? 'Following' : 'Follow'}
                     </button>
                 </div>
@@ -811,7 +836,6 @@
             currentUser.following.push(username);
         }
 
-        // Update in global users list
         let targetUser = users.find(u => u.username === username);
         if(targetUser) {
             if(!targetUser.followers) targetUser.followers = [];
@@ -928,8 +952,8 @@
 
         content.innerHTML = `
             <div id="chat-messages" style="flex:1; overflow-y:auto; padding:15px; display:flex; flex-direction:column; gap:10px; max-height:65vh;"></div>
-            <div style="display:flex; padding:10px; border-top:1px solid #dbdbdb; background:#fff;">
-                <input type="text" id="chat-msg-input" placeholder="Message..." style="flex:1; padding:10px; border:1px solid #dbdbdb; border-radius:20px; outline:none;">
+            <div style="display:flex; padding:10px; border-top:1px solid #efefef; background:#fff;">
+                <input type="text" id="chat-msg-input" placeholder="Message..." style="flex:1; padding:10px; border:1px solid #dbdbdb; border-radius:20px; outline:none; background:#fafafa;">
                 <button onclick="sendChatMessage('${chatKey}')" style="background:none; border:none; color:#0095f6; font-weight:600; margin-left:10px; cursor:pointer;">Send</button>
             </div>
         `;
@@ -997,7 +1021,7 @@
     function renderNotes() {
         let list = document.getElementById('notes-list');
         list.innerHTML = notes.map(n => `
-            <div style="background:#efefef; padding:10px; border-radius:8px; margin-bottom:8px;">
+            <div style="background:#fff; border:1px solid #efefef; padding:12px; border-radius:8px; margin-bottom:8px;">
                 <b>@${n.username}</b>: <span style="font-size:14px;">${n.text}</span>
             </div>
         `).join('');
@@ -1012,12 +1036,12 @@
         }
 
         list.innerHTML = reports.map(r => `
-            <div style="border:1px solid #dbdbdb; padding:12px; border-radius:6px; margin-bottom:10px;">
+            <div style="background:#fff; border:1px solid #dbdbdb; padding:14px; border-radius:8px; margin-bottom:12px;">
                 <p><b>Type:</b> ${r.type}</p>
                 <p><b>Reporter:</b> ${r.reporter}</p>
                 <p><b>Reason:</b> ${r.reason}</p>
-                <button onclick="resolveReport(${r.id}, true)" style="background:#ed4956; color:white; border:none; padding:6px 12px; border-radius:4px; margin-top:6px; cursor:pointer;">Remove Content</button>
-                <button onclick="resolveReport(${r.id}, false)" style="background:#dbdbdb; border:none; padding:6px 12px; border-radius:4px; margin-top:6px; cursor:pointer; margin-left:6px;">Dismiss</button>
+                <button onclick="resolveReport(${r.id}, true)" style="background:#ed4956; color:white; border:none; padding:6px 12px; border-radius:6px; margin-top:8px; cursor:pointer;">Remove Content</button>
+                <button onclick="resolveReport(${r.id}, false)" style="background:#dbdbdb; border:none; padding:6px 12px; border-radius:6px; margin-top:8px; cursor:pointer; margin-left:6px;">Dismiss</button>
             </div>
         `).join('');
     }
