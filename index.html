@@ -1,1070 +1,1922 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VibeGram</title>
-    <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VibeGram — Real-Time Clean Slate Social App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            obsidian: '#09090b',
+            surface: '#111115',
+            card: '#18181d',
+            elevated: '#222229',
+            accent: '#a855f7',
+            accentPink: '#ec4899',
+            accentCyan: '#22d3ee'
+          }
         }
-
-        body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            color: #262626;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
-
-        .hidden {
-            display: none !important;
-        }
-
-        /* App Container */
-        #app {
-            width: 100%;
-            max-width: 480px;
-            height: 100vh;
-            max-height: 850px;
-            background: #ffffff;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            overflow: hidden;
-            border-radius: 16px;
-        }
-
-        @media (max-width: 480px) {
-            #app {
-                height: 100vh;
-                max-height: 100vh;
-                border-radius: 0;
-                box-shadow: none;
-            }
-        }
-
-        /* Auth Screen */
-        .auth-container {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            padding: 40px;
-            text-align: center;
-            background: #fff;
-        }
-
-        .auth-container h1 {
-            font-family: 'Brush Script MT', cursive, sans-serif;
-            font-size: 52px;
-            margin-bottom: 24px;
-            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .auth-container input {
-            width: 100%;
-            padding: 14px;
-            margin-bottom: 12px;
-            border: 1px solid #dbdbdb;
-            border-radius: 8px;
-            background: #fafafa;
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        .auth-container input:focus {
-            border-color: #0095f6;
-        }
-
-        .auth-container button {
-            width: 100%;
-            padding: 14px;
-            background: #0095f6;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 6px;
-            box-shadow: 0 4px 12px rgba(0, 149, 246, 0.3);
-            transition: background 0.2s;
-        }
-
-        .auth-container button:hover {
-            background: #1877f2;
-        }
-
-        /* Header */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 16px;
-            border-bottom: 1px solid #efefef;
-            background: #fff;
-            height: 56px;
-        }
-
-        header .logo {
-            font-family: 'Brush Script MT', cursive, sans-serif;
-            font-size: 28px;
-            font-weight: bold;
-            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        header .header-icons span {
-            font-size: 22px;
-            margin-left: 16px;
-            cursor: pointer;
-        }
-
-        /* Main Content Body */
-        .content-body {
-            flex: 1;
-            overflow-y: auto;
-            background: #fafafa;
-            padding-bottom: 60px;
-        }
-
-        /* Stories Bar */
-        .stories-bar {
-            display: flex;
-            padding: 12px 16px;
-            background: #fff;
-            border-bottom: 1px solid #efefef;
-            overflow-x: auto;
-            gap: 16px;
-        }
-
-        .story-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            cursor: pointer;
-            min-width: 68px;
-        }
-
-        .story-ring {
-            width: 66px;
-            height: 66px;
-            border-radius: 50%;
-            background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 2px;
-        }
-
-        .story-ring.seen {
-            background: #dbdbdb;
-        }
-
-        .story-thumb {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid #fff;
-            background: #efefef;
-        }
-
-        .story-item span {
-            font-size: 11px;
-            margin-top: 4px;
-            max-width: 68px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            color: #262626;
-        }
-
-        /* Feed Posts */
-        .post {
-            background: #fff;
-            margin-bottom: 16px;
-            border-top: 1px solid #efefef;
-            border-bottom: 1px solid #efefef;
-        }
-
-        .post-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 16px;
-        }
-
-        .post-user {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 600;
-            font-size: 14px;
-        }
-
-        .post-user img {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            object-fit: cover;
-            background: #efefef;
-        }
-
-        .post-media {
-            width: 100%;
-            max-height: 450px;
-            background: #000;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .post-media img, .post-media video {
-            width: 100%;
-            max-height: 450px;
-            object-fit: contain;
-        }
-
-        .post-actions {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 16px;
-            font-size: 22px;
-        }
-
-        .post-actions div span {
-            cursor: pointer;
-            margin-right: 14px;
-        }
-
-        .post-likes {
-            padding: 0 16px;
-            font-weight: 600;
-            font-size: 13px;
-            margin-bottom: 6px;
-        }
-
-        .post-caption {
-            padding: 0 16px;
-            font-size: 14px;
-            margin-bottom: 6px;
-        }
-
-        .post-caption span {
-            font-weight: 600;
-            margin-right: 6px;
-        }
-
-        .post-comments-section {
-            padding: 0 16px 8px 16px;
-        }
-
-        .comment-item {
-            font-size: 13px;
-            margin-bottom: 4px;
-        }
-
-        .comment-item b {
-            margin-right: 6px;
-        }
-
-        .comment-input-box {
-            display: flex;
-            border-top: 1px solid #efefef;
-            padding: 8px 16px;
-        }
-
-        .comment-input-box input {
-            flex: 1;
-            border: none;
-            outline: none;
-            font-size: 13px;
-            background: transparent;
-        }
-
-        .comment-input-box button {
-            background: none;
-            border: none;
-            color: #0095f6;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        /* Bottom Nav */
-        nav.bottom-nav {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 52px;
-            background: #fff;
-            border-top: 1px solid #efefef;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            z-index: 10;
-        }
-
-        nav.bottom-nav span {
-            font-size: 24px;
-            cursor: pointer;
-            opacity: 0.8;
-            transition: opacity 0.2s;
-        }
-
-        nav.bottom-nav span:hover {
-            opacity: 1;
-        }
-
-        /* Modals / Screens */
-        .modal-screen {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #fff;
-            z-index: 20;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px 16px;
-            border-bottom: 1px solid #efefef;
-            font-weight: 600;
-            background: #fff;
-        }
-
-        .modal-header span {
-            cursor: pointer;
-            color: #0095f6;
-        }
-
-        .modal-content {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            background: #fafafa;
-        }
-
-        /* Reels View */
-        .reels-container {
-            flex: 1;
-            background: #000;
-            position: relative;
-            overflow-y: scroll;
-            scroll-snap-type: y mandatory;
-        }
-
-        .reel-item {
-            width: 100%;
-            height: 100%;
-            scroll-snap-align: start;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .reel-item video {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .reel-overlay {
-            position: absolute;
-            bottom: 60px;
-            left: 16px;
-            color: #fff;
-            text-shadow: 0 1px 3px rgba(0,0,0,0.8);
-        }
-
-        /* Direct Messages */
-        .chat-list-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 16px;
-            gap: 12px;
-            cursor: pointer;
-            border-bottom: 1px solid #efefef;
-            background: #fff;
-        }
-
-        .chat-list-item img {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            object-fit: cover;
-            background: #efefef;
-        }
-
-        /* Story Viewer Modal */
-        #story-viewer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.95);
-            z-index: 30;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            color: white;
-        }
-    </style>
-</head>
-<body>
-
-<div id="app">
-    <!-- AUTHENTICATION SCREEN -->
-    <div id="auth-screen" class="auth-container">
-        <h1>VibeGram</h1>
-        <p style="margin-bottom: 24px; color: #8e8e8e; font-size: 14px;">Log in with your phone number and username</p>
-        <input type="text" id="auth-username" placeholder="Username">
-        <input type="tel" id="auth-phone" placeholder="Mobile Number">
-        <button onclick="handleLogin()">Log In / Sign Up</button>
-    </div>
-
-    <!-- MAIN APP SCREEN -->
-    <div id="main-app" class="hidden" style="display:flex; flex-direction:column; height:100%; width:100%; position:relative;">
-        <header>
-            <div class="logo">VibeGram</div>
-            <div class="header-icons">
-                <span onclick="openCreateModal()">➕</span>
-                <span onclick="openMessages()">💬</span>
-            </div>
-        </header>
-
-        <div class="content-body" id="feed-container">
-            <!-- Stories Bar & Posts Feed injected dynamically -->
-        </div>
-
-        <!-- BOTTOM NAVIGATION -->
-        <nav class="bottom-nav">
-            <span onclick="switchTab('feed')">🏠</span>
-            <span onclick="switchTab('reels')">🎬</span>
-            <span onclick="openExplore()">🔍</span>
-            <span onclick="openNotesModal()">📝</span>
-            <span onclick="openProfile()">👤</span>
-            <span id="admin-nav-icon" class="hidden" onclick="openAdminPanel()">🛡️</span>
-        </nav>
-    </div>
-
-    <!-- CREATE POST / REEL / STORY MODAL -->
-    <div id="create-modal" class="modal-screen hidden">
-        <div class="modal-header">
-            <span onclick="closeCreateModal()">Cancel</span>
-            <b>Create New</b>
-            <span onclick="submitCreate()">Share</span>
-        </div>
-        <div class="modal-content">
-            <select id="create-type" style="width:100%; padding:12px; margin-bottom:15px; border-radius:8px; border:1px solid #dbdbdb; background:#fff;">
-                <option value="post">Post (Photo/Video)</option>
-                <option value="reel">Reel (Video)</option>
-                <option value="story">Story (Photo/Video)</option>
-            </select>
-            <label style="display:block; margin-bottom:8px; font-weight:600; font-size:14px;">Select from Gallery:</label>
-            <input type="file" id="media-file-input" accept="image/*,video/*" style="margin-bottom:15px; width:100%; padding:8px; background:#fff; border:1px solid #dbdbdb; border-radius:8px;">
-            <textarea id="create-caption" placeholder="Write a caption..." style="width:100%; height:90px; padding:12px; border-radius:8px; border:1px solid #dbdbdb; resize:none; background:#fff;"></textarea>
-        </div>
-    </div>
-
-    <!-- EXPLORE / USERS LIST MODAL -->
-    <div id="explore-modal" class="modal-screen hidden">
-        <div class="modal-header">
-            <span onclick="closeExplore()">Close</span>
-            <b>Discover Accounts</b>
-            <span></span>
-        </div>
-        <div class="modal-content" id="explore-users-list">
-            <!-- Users list to follow/unfollow -->
-        </div>
-    </div>
-
-    <!-- MESSAGES / CHATS MODAL -->
-    <div id="messages-modal" class="modal-screen hidden">
-        <div class="modal-header">
-            <span onclick="closeMessages()">Back</span>
-            <b id="chat-header-title">Messages</b>
-            <span onclick="openNewGroupModal()">New Group</span>
-        </div>
-        <div class="modal-content" id="messages-content" style="padding:0;">
-            <!-- Chat list -->
-        </div>
-    </div>
-
-    <!-- NOTES MODAL -->
-    <div id="notes-modal" class="modal-screen hidden">
-        <div class="modal-header">
-            <span onclick="closeNotesModal()">Close</span>
-            <b>Notes</b>
-            <span onclick="saveNote()">Post</span>
-        </div>
-        <div class="modal-content">
-            <input type="text" id="note-input" placeholder="Share what's on your mind..." maxlength="60" style="width:100%; padding:14px; border:1px solid #dbdbdb; border-radius:8px; margin-bottom:15px; background:#fff;">
-            <div id="notes-list"></div>
-        </div>
-    </div>
-
-    <!-- ADMIN PANEL MODAL -->
-    <div id="admin-panel" class="modal-screen hidden">
-        <div class="modal-header">
-            <span onclick="closeAdminPanel()">Close</span>
-            <b>Admin Moderation</b>
-            <span></span>
-        </div>
-        <div class="modal-content" id="admin-reports-list"></div>
-    </div>
-
-    <!-- STORY VIEWER -->
-    <div id="story-viewer" class="hidden" onclick="closeStoryViewer()">
-        <div style="position:absolute; top:20px; left:20px; font-weight:600;" id="story-viewer-user">User</div>
-        <div id="story-viewer-media-container" style="display:flex; justify-content:center; align-items:center; width:100%; height:100%;"></div>
-    </div>
-</div>
-
-<script>
-    let currentUser = JSON.parse(localStorage.getItem('vb_current_user')) || null;
-    let users = JSON.parse(localStorage.getItem('vb_users')) || [];
-    let posts = JSON.parse(localStorage.getItem('vb_posts')) || [];
-    let stories = JSON.parse(localStorage.getItem('vb_stories')) || [];
-    let reels = JSON.parse(localStorage.getItem('vb_reels')) || [];
-    let notes = JSON.parse(localStorage.getItem('vb_notes')) || [];
-    let reports = JSON.parse(localStorage.getItem('vb_reports')) || [];
-    let chats = JSON.parse(localStorage.getItem('vb_chats')) || [];
-
-    function cleanExpiredStories() {
-        const now = Date.now();
-        const twentyFourHours = 24 * 60 * 60 * 1000;
-        stories = stories.filter(s => (now - s.timestamp) < twentyFourHours);
-        localStorage.setItem('vb_stories', JSON.stringify(stories));
+      }
+    };
+  </script>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      background-color: #09090b;
+      color: #f4f4f5;
+      font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
+    .no-scrollbar::-webkit-scrollbar { display: none; }
+    .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    .story-ring-active {
+      background: linear-gradient(135deg, #a855f7 0%, #ec4899 55%, #f59e0b 100%);
+      padding: 2.5px;
+    }
+    .story-ring-seen {
+      background: #3f3f46;
+      padding: 2px;
+    }
+    .glass {
+      background: rgba(17, 17, 21, 0.88);
+      backdrop-filter: blur(14px);
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-obsidian text-zinc-100 antialiased selection:bg-purple-500/30 selection:text-purple-200">
 
-    window.onload = function() {
-        cleanExpiredStories();
-        if (currentUser) {
-            let found = users.find(u => u.username === currentUser.username);
-            if(found) {
-                currentUser = found;
-            } else {
-                users.push(currentUser);
-                localStorage.setItem('vb_users', JSON.stringify(users));
-            }
-            startAppSession();
-        }
+  <!-- Toast Container -->
+  <div id="toastContainer" class="fixed top-4 right-4 z-[100] flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- AUTH / ONBOARDING SCREEN -->
+  <div id="authScreen" class="min-h-screen flex items-center justify-center p-4 bg-[radial-gradient(circle_at_top,_rgba(168,85,247,0.16),_transparent_55%)]">
+    <div class="w-full max-w-md bg-surface border border-zinc-800/90 rounded-2xl p-6 sm:p-8 shadow-2xl">
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 via-pink-500 to-amber-400 flex items-center justify-center font-extrabold text-white text-lg shadow-lg shadow-purple-500/20">
+            V
+          </div>
+          <div>
+            <h1 class="text-xl font-bold tracking-tight">VibeGram</h1>
+            <p class="text-xs text-zinc-400">Clean slate • Permanent Reels • 24h Stories &amp; Notes</p>
+          </div>
+        </div>
+        <button onclick="openFirebaseModal()" class="text-xs px-2.5 py-1.5 rounded-lg bg-elevated hover:bg-zinc-700/80 border border-zinc-700/70 text-zinc-200 flex items-center gap-1.5 transition" title="Configure Firebase Real-Time Sync">
+          <span id="authSyncDot" class="w-2 h-2 rounded-full bg-amber-400"></span>
+          <span id="authSyncLabel">Sandbox</span>
+        </button>
+      </div>
+
+      <div class="bg-zinc-900/90 border border-zinc-800 rounded-xl p-3.5 mb-5 text-xs text-zinc-300 space-y-1">
+        <div class="font-semibold text-purple-300">Zero Pre-Seeded Content</div>
+        <p class="text-zinc-400 leading-relaxed">
+          No fake accounts, posts, stories, reels, or chats exist here. Connect Firebase Firestore to sync across devices, or test locally in Sandbox mode. The first registered account (or username <span class="text-zinc-200 font-mono">admin</span>) gets Admin access.
+        </p>
+      </div>
+
+      <!-- Mode Tabs -->
+      <div class="grid grid-cols-2 gap-1 bg-zinc-900 p-1 rounded-xl border border-zinc-800 mb-5">
+        <button id="tabSignup" onclick="setAuthTab('signup')" class="py-2 text-xs font-semibold rounded-lg bg-purple-600 text-white transition">Create Account</button>
+        <button id="tabLogin" onclick="setAuthTab('login')" class="py-2 text-xs font-semibold rounded-lg text-zinc-400 hover:text-zinc-200 transition">Log In</button>
+      </div>
+
+      <form id="authForm" onsubmit="handleAuthSubmit(event)" class="space-y-4">
+        <div id="displayNameField">
+          <label class="block text-xs font-medium text-zinc-300 mb-1.5">Display Name</label>
+          <input id="authDisplayName" type="text" placeholder="e.g. Aarav Sharma" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 focus:border-purple-500 focus:outline-none text-sm" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-zinc-300 mb-1.5">Username</label>
+          <div class="relative">
+            <span class="absolute left-3.5 top-1/2 -translate-y-1/2 text-zinc-500 text-sm">@</span>
+            <input id="authUsername" type="text" required placeholder="your_handle" class="w-full pl-8 pr-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 focus:border-purple-500 focus:outline-none text-sm" />
+          </div>
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-zinc-300 mb-1.5">Passcode / PIN</label>
+          <input id="authPin" type="password" required minlength="3" placeholder="At least 3 characters" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 focus:border-purple-500 focus:outline-none text-sm" />
+        </div>
+        <button type="submit" id="authSubmitBtn" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 font-semibold text-sm text-white shadow-lg shadow-purple-600/20 transition">
+          Create Account &amp; Enter
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- MAIN APP SHELL -->
+  <div id="mainApp" class="hidden min-h-screen flex flex-col lg:flex-row">
+    <!-- Mobile Top Header -->
+    <header class="lg:hidden sticky top-0 z-40 glass border-b border-zinc-800/80 px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-purple-600 via-pink-500 to-amber-400 flex items-center justify-center font-extrabold text-sm">V</div>
+        <span class="font-bold text-base tracking-tight">VibeGram</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="simulatePlus24Hours()" class="px-2.5 py-1 rounded-lg bg-elevated hover:bg-zinc-700 border border-zinc-700/70 text-[11px] font-medium text-amber-300 transition" title="Fast-forward clock +24h to test Story & Note expiration">
+          +24h Test
+        </button>
+        <button onclick="openFirebaseModal()" class="px-2.5 py-1 rounded-lg bg-elevated hover:bg-zinc-700 border border-zinc-700/70 text-[11px] flex items-center gap-1.5 transition">
+          <span class="mobile-sync-dot w-2 h-2 rounded-full bg-amber-400"></span>
+          <span class="sync-label">Sandbox</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Desktop Left Sidebar -->
+    <aside class="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-surface border-r border-zinc-800/80 p-4 justify-between z-30">
+      <div>
+        <div class="flex items-center justify-between px-2 py-2 mb-4">
+          <div class="flex items-center gap-2.5">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-purple-600 via-pink-500 to-amber-400 flex items-center justify-center font-extrabold text-base shadow-md shadow-purple-500/20">V</div>
+            <div>
+              <div class="font-bold text-base leading-tight">VibeGram</div>
+              <button onclick="openFirebaseModal()" class="text-[11px] text-zinc-400 hover:text-zinc-200 flex items-center gap-1.5 mt-0.5">
+                <span class="desktop-sync-dot w-2 h-2 rounded-full bg-amber-400"></span>
+                <span class="sync-label">Local Sandbox</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <nav class="space-y-1">
+          <button data-nav="home" onclick="switchView('home')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium bg-elevated text-white transition">
+            <span>🏠</span><span>Home Feed</span>
+          </button>
+          <button data-nav="reels" onclick="switchView('reels')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-zinc-400 hover:text-white hover:bg-zinc-900 transition">
+            <span>🎬</span><span>Reels</span><span class="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/25">Permanent</span>
+          </button>
+          <button data-nav="messages" onclick="switchView('messages')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-zinc-400 hover:text-white hover:bg-zinc-900 transition">
+            <span>💬</span><span>Messages &amp; Notes</span>
+          </button>
+          <button data-nav="create" onclick="openCreateModal('post')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-zinc-400 hover:text-white hover:bg-zinc-900 transition">
+            <span>➕</span><span>Create</span>
+          </button>
+          <button data-nav="profile" onclick="switchView('profile')" class="nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-zinc-400 hover:text-white hover:bg-zinc-900 transition">
+            <span>👤</span><span>Profile</span>
+          </button>
+          <button id="adminNavBtn" data-nav="admin" onclick="switchView('admin')" class="hidden nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-zinc-400 hover:text-white hover:bg-zinc-900 transition">
+            <span>🛡️</span><span>Admin Panel</span>
+          </button>
+        </nav>
+
+        <!-- Time Simulation Helper for 24h Stories & Notes -->
+        <div class="mt-6 p-3 rounded-xl bg-zinc-900/90 border border-zinc-800/90 space-y-2">
+          <div class="flex items-center justify-between text-[11px]">
+            <span class="text-zinc-400 font-medium">Clock Offset</span>
+            <span id="clockOffsetLabel" class="font-mono text-amber-300">+0h</span>
+          </div>
+          <p class="text-[11px] text-zinc-500 leading-snug">
+            Stories &amp; Notes expire after 24h. Reels &amp; Posts never expire.
+          </p>
+          <div class="flex gap-1.5 pt-0.5">
+            <button onclick="simulatePlus24Hours()" class="flex-1 py-1.5 px-2 rounded-lg bg-elevated hover:bg-zinc-700 text-[11px] font-medium text-amber-200 border border-zinc-700/70 transition">+24h Expire Test</button>
+            <button onclick="resetClockOffset()" class="py-1.5 px-2 rounded-lg bg-zinc-800/70 hover:bg-zinc-800 text-[11px] text-zinc-400 transition" title="Reset clock offset">Reset</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Current User Footer + Account Switcher -->
+      <div class="border-t border-zinc-800/80 pt-3 space-y-2">
+        <div id="sidebarCurrentUser" class="flex items-center justify-between gap-2 px-2 py-1.5 rounded-xl bg-zinc-900/70"></div>
+        <div class="flex gap-1.5">
+          <button onclick="openSwitchAccountModal()" class="flex-1 py-1.5 px-2.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-xs text-zinc-300 transition">Switch User</button>
+          <button onclick="logoutUser()" class="py-1.5 px-2.5 rounded-lg bg-zinc-900 hover:bg-rose-950/50 border border-zinc-800 hover:border-rose-800/50 text-xs text-zinc-400 hover:text-rose-300 transition">Log Out</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 lg:pl-64 pb-20 lg:pb-8">
+      <div class="max-w-3xl mx-auto px-3 sm:px-6 pt-4">
+
+        <!-- VIEW: HOME FEED (24h Stories + Permanent Posts) -->
+        <section id="view-home" class="app-view space-y-6">
+          <!-- 24-Hour Stories Bar -->
+          <div class="bg-surface border border-zinc-800/80 rounded-2xl p-3.5">
+            <div class="flex items-center justify-between mb-2.5 px-1">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-semibold uppercase tracking-wider text-zinc-300">Stories</span>
+                <span class="text-[11px] px-2 py-0.5 rounded-full bg-purple-500/15 text-purple-300 border border-purple-500/25">24h Auto-Expire</span>
+              </div>
+              <button onclick="openCreateModal('story')" class="text-xs font-medium text-purple-400 hover:text-purple-300 transition">+ Add Story</button>
+            </div>
+            <div id="storiesBar" class="flex items-center gap-3.5 overflow-x-auto no-scrollbar pb-1"></div>
+          </div>
+
+          <!-- Feed Filter & Quick Actions -->
+          <div class="flex items-center justify-between gap-2">
+            <div>
+              <h2 class="text-base font-bold">Feed</h2>
+              <p class="text-xs text-zinc-400">Posts &amp; Reels stay forever; only Stories and Notes expire after 24 hours.</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="openCreateModal('post')" class="px-3 py-1.5 rounded-xl bg-elevated hover:bg-zinc-700 border border-zinc-700/70 text-xs font-medium transition">+ Post</button>
+              <button onclick="openCreateModal('reel')" class="px-3 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-xs font-semibold text-white transition">+ Reel</button>
+            </div>
+          </div>
+
+          <!-- Posts Container -->
+          <div id="postsFeed" class="space-y-4"></div>
+        </section>
+
+        <!-- VIEW: PERMANENT REELS -->
+        <section id="view-reels" class="app-view hidden space-y-5">
+          <div class="flex flex-wrap items-center justify-between gap-3 bg-surface border border-zinc-800/80 rounded-2xl p-4">
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="text-lg font-bold">Reels</h2>
+                <span class="text-[11px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/25">Never Expire (24h+ Safe)</span>
+              </div>
+              <p class="text-xs text-zinc-400 mt-0.5">All Reels remain permanently visible to users even after 24 hours.</p>
+            </div>
+            <button onclick="openCreateModal('reel')" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-xs font-semibold text-white transition">+ Upload Reel</button>
+          </div>
+          <div id="reelsContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+        </section>
+
+        <!-- VIEW: MESSAGES & 24H EXPIRING NOTES -->
+        <section id="view-messages" class="app-view hidden space-y-5">
+          <!-- 24h Status Notes Bar -->
+          <div class="bg-surface border border-zinc-800/80 rounded-2xl p-4">
+            <div class="flex items-center justify-between mb-3">
+              <div class="flex items-center gap-2">
+                <h2 class="text-sm font-bold">Notes</h2>
+                <span class="text-[11px] px-2 py-0.5 rounded-full bg-pink-500/15 text-pink-300 border border-pink-500/25">24h Auto-Expire</span>
+              </div>
+              <button onclick="openNoteModal()" class="text-xs font-medium text-pink-400 hover:text-pink-300 transition">+ Set 24h Note</button>
+            </div>
+            <div id="notesBar" class="flex items-start gap-3 overflow-x-auto no-scrollbar pb-1"></div>
+          </div>
+
+          <!-- Chat Workspace -->
+          <div class="grid grid-cols-1 md:grid-cols-12 gap-4 bg-surface border border-zinc-800/80 rounded-2xl overflow-hidden min-h-[480px]">
+            <!-- Left: Conversations & Start Chat -->
+            <div class="md:col-span-5 border-b md:border-b-0 md:border-r border-zinc-800/80 p-3.5 flex flex-col justify-between bg-zinc-950/40">
+              <div>
+                <div class="flex items-center justify-between mb-3">
+                  <h3 class="text-xs font-semibold uppercase tracking-wider text-zinc-400">Chats</h3>
+                  <button onclick="openNewChatModal()" class="text-xs px-2.5 py-1 rounded-lg bg-elevated hover:bg-zinc-700 text-purple-300 font-medium transition">+ New Chat</button>
+                </div>
+                <div id="chatThreadList" class="space-y-1.5 max-h-60 md:max-h-[370px] overflow-y-auto no-scrollbar"></div>
+              </div>
+            </div>
+
+            <!-- Right: Active Thread -->
+            <div class="md:col-span-7 flex flex-col justify-between p-4">
+              <div id="activeChatHeader" class="pb-3 border-b border-zinc-800/80 flex items-center justify-between">
+                <span class="text-sm font-semibold text-zinc-400">Select or start a chat</span>
+              </div>
+
+              <div id="chatMessagesList" class="flex-1 py-3 space-y-2.5 max-h-72 overflow-y-auto no-scrollbar">
+                <div class="h-full flex items-center justify-center text-xs text-zinc-500 py-12">
+                  No active conversation selected yet.
+                </div>
+              </div>
+
+              <!-- Sticker & GIF Quick Drawer -->
+              <div id="chatExtrasDrawer" class="hidden mb-2.5 p-2.5 rounded-xl bg-zinc-900 border border-zinc-800 space-y-2">
+                <div class="flex items-center justify-between text-[11px]">
+                  <span class="text-zinc-400 font-medium">Stickers &amp; GIFs</span>
+                  <button onclick="openStickerStudio()" class="text-purple-400 hover:text-purple-300 font-medium">+ Draw Custom Sticker</button>
+                </div>
+                <div id="stickerPickerGrid" class="flex flex-wrap gap-2 max-h-24 overflow-y-auto no-scrollbar"></div>
+              </div>
+
+              <form id="chatSendForm" onsubmit="handleSendMessage(event)" class="pt-2 border-t border-zinc-800/80 flex items-center gap-2">
+                <button type="button" onclick="toggleChatExtras()" class="px-2.5 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-sm transition" title="Stickers & GIFs">🎨</button>
+                <input id="chatMessageInput" type="text" placeholder="Write a message..." class="flex-1 px-3.5 py-2 rounded-xl bg-zinc-900 border border-zinc-800 focus:border-purple-500 focus:outline-none text-sm" />
+                <button type="submit" class="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-xs font-semibold text-white transition">Send</button>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <!-- VIEW: PROFILE -->
+        <section id="view-profile" class="app-view hidden space-y-5">
+          <div id="profileHeaderCard" class="bg-surface border border-zinc-800/80 rounded-2xl p-5"></div>
+
+          <div class="flex items-center gap-2 border-b border-zinc-800/80 pb-2">
+            <button id="profTabPosts" onclick="setProfileTab('posts')" class="px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-elevated text-white">Permanent Posts</button>
+            <button id="profTabReels" onclick="setProfileTab('reels')" class="px-3.5 py-1.5 rounded-xl text-xs font-medium text-zinc-400 hover:text-white">Permanent Reels</button>
+            <button id="profTabStories" onclick="setProfileTab('stories')" class="px-3.5 py-1.5 rounded-xl text-xs font-medium text-zinc-400 hover:text-white">Active 24h Stories</button>
+          </div>
+
+          <div id="profileItemsGrid" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
+        </section>
+
+        <!-- VIEW: ADMIN PANEL -->
+        <section id="view-admin" class="app-view hidden space-y-5">
+          <div class="bg-surface border border-zinc-800/80 rounded-2xl p-5">
+            <h2 class="text-lg font-bold">Admin Moderation Panel</h2>
+            <p class="text-xs text-zinc-400 mt-1">Manage registered user accounts, content retention rules, and live platform counts.</p>
+            <div id="adminStatsGrid" class="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-4"></div>
+          </div>
+          <div class="bg-surface border border-zinc-800/80 rounded-2xl p-5">
+            <h3 class="text-sm font-bold mb-3">Registered Users</h3>
+            <div id="adminUsersList" class="space-y-2.5"></div>
+          </div>
+        </section>
+
+      </div>
+    </main>
+
+    <!-- Mobile Bottom Navigation -->
+    <nav class="lg:hidden fixed bottom-0 inset-x-0 z-40 glass border-t border-zinc-800/80 px-2 py-1.5 flex items-center justify-around">
+      <button data-nav="home" onclick="switchView('home')" class="nav-btn flex flex-col items-center py-1 px-2.5 rounded-xl text-white text-[11px]">
+        <span class="text-base">🏠</span><span>Home</span>
+      </button>
+      <button data-nav="reels" onclick="switchView('reels')" class="nav-btn flex flex-col items-center py-1 px-2.5 rounded-xl text-zinc-400 text-[11px]">
+        <span class="text-base">🎬</span><span>Reels</span>
+      </button>
+      <button onclick="openCreateModal('post')" class="flex flex-col items-center py-1 px-2.5 rounded-xl text-purple-400 text-[11px] font-semibold">
+        <span class="text-base">➕</span><span>Create</span>
+      </button>
+      <button data-nav="messages" onclick="switchView('messages')" class="nav-btn flex flex-col items-center py-1 px-2.5 rounded-xl text-zinc-400 text-[11px]">
+        <span class="text-base">💬</span><span>Chats</span>
+      </button>
+      <button data-nav="profile" onclick="switchView('profile')" class="nav-btn flex flex-col items-center py-1 px-2.5 rounded-xl text-zinc-400 text-[11px]">
+        <span class="text-base">👤</span><span>Profile</span>
+      </button>
+    </nav>
+  </div>
+
+  <!-- MODAL: CREATE (POST / PERMANENT REEL / 24H STORY) -->
+  <div id="createModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="w-full max-w-lg bg-surface border border-zinc-800 rounded-2xl p-5 sm:p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 id="createModalTitle" class="text-base font-bold">Create Content</h3>
+          <p id="createModalSubtitle" class="text-xs text-zinc-400"></p>
+        </div>
+        <button onclick="closeModal('createModal')" class="text-zinc-400 hover:text-white text-lg px-2">✕</button>
+      </div>
+
+      <div class="grid grid-cols-3 gap-1.5 bg-zinc-900 p-1 rounded-xl border border-zinc-800">
+        <button id="createType-post" type="button" onclick="setCreateType('post')" class="py-1.5 rounded-lg text-xs font-semibold bg-elevated text-white">Post (Forever)</button>
+        <button id="createType-reel" type="button" onclick="setCreateType('reel')" class="py-1.5 rounded-lg text-xs font-medium text-zinc-400 hover:text-white">Reel (Forever)</button>
+        <button id="createType-story" type="button" onclick="setCreateType('story')" class="py-1.5 rounded-lg text-xs font-medium text-zinc-400 hover:text-white">Story (24h Only)</button>
+      </div>
+
+      <form onsubmit="handleCreateSubmit(event)" class="space-y-3.5">
+        <div>
+          <label class="block text-xs font-medium text-zinc-300 mb-1">Upload File (Image or Video)</label>
+          <input id="createFileInput" type="file" accept="image/*,video/*" onchange="handleMediaFileSelect(event)" class="w-full text-xs text-zinc-400 file:mr-3 file:py-2 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-elevated file:text-zinc-200 hover:file:bg-zinc-700" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-zinc-300 mb-1">Or Media URL (Optional)</label>
+          <input id="createMediaUrl" type="url" oninput="handleMediaUrlInput(event)" placeholder="https://example.com/media.mp4 or .jpg" class="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-800 focus:border-purple-500 focus:outline-none text-sm" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-medium text-zinc-300 mb-1">Caption / Text</label>
+          <textarea id="createCaption" rows="3" placeholder="Share something with everyone..." class="w-full px-3 py-2 rounded-xl bg-zinc-900 border border-zinc-800 focus:border-purple-500 focus:outline-none text-sm"></textarea>
+        </div>
+
+        <div id="createPreviewBox" class="hidden rounded-xl overflow-hidden border border-zinc-800 bg-zinc-950 p-2">
+          <div class="text-[11px] text-zinc-400 mb-1.5">Preview</div>
+          <div id="createPreviewContent" class="flex items-center justify-center max-h-56 overflow-hidden rounded-lg"></div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" onclick="closeModal('createModal')" class="px-4 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 text-xs font-medium text-zinc-300">Cancel</button>
+          <button type="submit" class="px-5 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-xs font-semibold text-white">Publish</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: STORY VIEWER -->
+  <div id="storyViewerModal" class="hidden fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-surface border border-zinc-800 rounded-2xl overflow-hidden">
+      <div class="p-3.5 border-b border-zinc-800/80 flex items-center justify-between">
+        <div id="storyViewerAuthor" class="flex items-center gap-2.5"></div>
+        <div class="flex items-center gap-2">
+          <span id="storyViewerExpiry" class="text-[11px] px-2 py-0.5 rounded-full bg-purple-500/15 text-purple-300"></span>
+          <button onclick="closeModal('storyViewerModal')" class="text-zinc-400 hover:text-white text-lg px-1.5">✕</button>
+        </div>
+      </div>
+      <div id="storyViewerBody" class="p-5 min-h-[300px] flex flex-col items-center justify-center text-center bg-zinc-950"></div>
+    </div>
+  </div>
+
+  <!-- MODAL: SET 24H NOTE -->
+  <div id="noteModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="w-full max-w-sm bg-surface border border-zinc-800 rounded-2xl p-5 space-y-4">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-base font-bold">Set a 24-Hour Note</h3>
+          <p class="text-xs text-zinc-400">Automatically expires after 24 hours.</p>
+        </div>
+        <button onclick="closeModal('noteModal')" class="text-zinc-400 hover:text-white text-lg">✕</button>
+      </div>
+      <form onsubmit="handleNoteSubmit(event)" class="space-y-3">
+        <input id="noteTextInput" type="text" maxlength="80" required placeholder="What's on your mind? (max 80 chars)" class="w-full px-3.5 py-2.5 rounded-xl bg-zinc-900 border border-zinc-800 focus:border-pink-500 focus:outline-none text-sm" />
+        <div class="flex justify-end gap-2">
+          <button type="button" onclick="closeModal('noteModal')" class="px-3.5 py-2 rounded-xl bg-zinc-900 text-xs text-zinc-300">Cancel</button>
+          <button type="submit" class="px-4 py-2 rounded-xl bg-pink-600 hover:bg-pink-500 text-xs font-semibold text-white">Save Note</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: NEW CHAT -->
+  <div id="newChatModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-surface border border-zinc-800 rounded-2xl p-5 space-y-4">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-bold">Start Direct or Group Chat</h3>
+        <button onclick="closeModal('newChatModal')" class="text-zinc-400 hover:text-white text-lg">✕</button>
+      </div>
+      <form onsubmit="handleCreateChat(event)" class="space-y-3">
+        <div>
+          <label class="block text-xs font-medium text-zinc-300 mb-1">Group Title (leave blank for 1-on-1 DM)</label>
+          <input id="newChatTitle" type="text" placeholder="e.g. Squad Chat" class="w-full px-3.5 py-2 rounded-xl bg-zinc-900 border border-zinc-800 focus:border-purple-500 focus:outline-none text-sm" />
+        </div>
+        <div>
+          <label class="block text-xs font-medium text-zinc-300 mb-1">Select Registered Users</label>
+          <div id="newChatUserCheckboxes" class="space-y-1.5 max-h-48 overflow-y-auto bg-zinc-900/70 p-2.5 rounded-xl border border-zinc-800"></div>
+        </div>
+        <div class="flex justify-end gap-2 pt-1">
+          <button type="button" onclick="closeModal('newChatModal')" class="px-3.5 py-2 rounded-xl bg-zinc-900 text-xs text-zinc-300">Cancel</button>
+          <button type="submit" class="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-xs font-semibold text-white">Open Chat</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- MODAL: STICKER STUDIO -->
+  <div id="stickerModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="w-full max-w-sm bg-surface border border-zinc-800 rounded-2xl p-5 space-y-3.5">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-bold">Draw Custom Sticker</h3>
+        <button onclick="closeModal('stickerModal')" class="text-zinc-400 hover:text-white text-lg">✕</button>
+      </div>
+      <div class="flex items-center justify-between gap-2 text-xs">
+        <label class="flex items-center gap-1.5 text-zinc-300">
+          Color <input id="stickerColor" type="color" value="#ec4899" class="w-7 h-7 rounded bg-transparent border-0 cursor-pointer" />
+        </label>
+        <button type="button" onclick="clearStickerCanvas()" class="px-2.5 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-300">Clear</button>
+      </div>
+      <canvas id="stickerCanvas" width="240" height="240" class="mx-auto rounded-xl bg-zinc-950 border border-zinc-800 touch-none cursor-crosshair"></canvas>
+      <div class="flex justify-end gap-2">
+        <button type="button" onclick="closeModal('stickerModal')" class="px-3.5 py-2 rounded-xl bg-zinc-900 text-xs text-zinc-300">Cancel</button>
+        <button type="button" onclick="saveCustomSticker()" class="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-xs font-semibold text-white">Save &amp; Send Sticker</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: SWITCH ACCOUNT -->
+  <div id="switchAccountModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="w-full max-w-sm bg-surface border border-zinc-800 rounded-2xl p-5 space-y-3.5">
+      <div class="flex items-center justify-between">
+        <h3 class="text-base font-bold">Switch Registered Account</h3>
+        <button onclick="closeModal('switchAccountModal')" class="text-zinc-400 hover:text-white text-lg">✕</button>
+      </div>
+      <div id="switchAccountList" class="space-y-2 max-h-60 overflow-y-auto"></div>
+      <button onclick="closeModal('switchAccountModal'); logoutUser();" class="w-full py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-xs font-medium text-zinc-300">Create New / Sign In With Another Account</button>
+    </div>
+  </div>
+
+  <!-- MODAL: FIREBASE FIRESTORE REAL-TIME CONFIG -->
+  <div id="firebaseModal" class="hidden fixed inset-0 z-50 bg-black/85 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="w-full max-w-lg bg-surface border border-zinc-800 rounded-2xl p-5 sm:p-6 space-y-4 max-h-[90vh] overflow-y-auto">
+      <div class="flex items-center justify-between">
+        <div>
+          <h3 class="text-base font-bold">Real-Time Cloud Sync (Firebase Firestore)</h3>
+          <p class="text-xs text-zinc-400">Connect Firestore so users across different devices see Reels, Posts, 24h Stories &amp; Notes live.</p>
+        </div>
+        <button onclick="closeModal('firebaseModal')" class="text-zinc-400 hover:text-white text-lg">✕</button>
+      </div>
+
+      <div class="bg-zinc-900/90 border border-zinc-800 rounded-xl p-3 text-xs text-zinc-300 space-y-1.5">
+        <div class="font-semibold text-cyan-300">Quick Setup</div>
+        <p class="text-zinc-400">
+          1. Create a Firebase project and enable <span class="text-zinc-200">Firestore Database</span> (Test mode for quick testing).<br/>
+          2. Paste your Firebase config JSON object below and click <span class="text-zinc-200">Connect Live Sync</span>.
+        </p>
+      </div>
+
+      <div>
+        <label class="block text-xs font-medium text-zinc-300 mb-1">Firebase Config JSON</label>
+        <textarea id="firebaseConfigInput" rows="7" placeholder='{
+  "apiKey": "AIza...",
+  "authDomain": "your-app.firebaseapp.com",
+  "projectId": "your-project-id",
+  "storageBucket": "your-app.appspot.com",
+  "messagingSenderId": "123456789",
+  "appId": "1:123456789:web:abcdef"
+}' class="w-full px-3 py-2.5 rounded-xl bg-zinc-950 border border-zinc-800 focus:border-cyan-500 focus:outline-none font-mono text-xs text-zinc-200"></textarea>
+      </div>
+
+      <div class="flex flex-wrap items-center justify-between gap-2 pt-1">
+        <button type="button" onclick="disconnectFirebase()" class="px-3.5 py-2 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-xs text-zinc-300">Use Local Sandbox</button>
+        <div class="flex gap-2">
+          <button type="button" onclick="closeModal('firebaseModal')" class="px-3.5 py-2 rounded-xl bg-zinc-900 text-xs text-zinc-400">Cancel</button>
+          <button type="button" onclick="connectFirebaseFromModal()" class="px-4 py-2 rounded-xl bg-cyan-600 hover:bg-cyan-500 text-xs font-semibold text-white">Connect Live Sync</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp, getApps, deleteApp } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js';
+    import {
+      getFirestore,
+      collection,
+      doc,
+      setDoc,
+      updateDoc,
+      deleteDoc,
+      onSnapshot,
+      arrayUnion,
+      arrayRemove
+    } from 'https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js';
+
+    const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
+    const STORAGE_KEYS = {
+      session: 'vg_clean_session_v1',
+      firebaseConfig: 'vg_clean_fb_config_v1',
+      clockOffset: 'vg_clean_clock_offset_v1',
+      sandboxUsers: 'vg_clean_sb_users_v1',
+      sandboxPosts: 'vg_clean_sb_posts_v1',
+      sandboxReels: 'vg_clean_sb_reels_v1',
+      sandboxStories: 'vg_clean_sb_stories_v1',
+      sandboxNotes: 'vg_clean_sb_notes_v1',
+      sandboxChats: 'vg_clean_sb_chats_v1',
+      sandboxStickers: 'vg_clean_sb_stickers_v1'
     };
 
-    function handleLogin() {
-        let username = document.getElementById('auth-username').value.trim();
-        let phone = document.getElementById('auth-phone').value.trim();
-        if(!username || !phone) {
-            alert('Please enter both username and mobile number.');
-            return;
-        }
+    const BUILTIN_GIF_STICKERS = [
+      { id: 'gif-spark', label: '✨ Vibe', emoji: '✨', bg: 'from-purple-600 to-pink-600' },
+      { id: 'gif-fire', label: '🔥 Lit', emoji: '🔥', bg: 'from-orange-500 to-rose-600' },
+      { id: 'gif-100', label: '💯 Real', emoji: '💯', bg: 'from-emerald-500 to-teal-600' },
+      { id: 'gif-cool', label: '😎 Chill', emoji: '😎', bg: 'from-cyan-500 to-blue-600' },
+      { id: 'gif-heart', label: '💜 Love', emoji: '💜', bg: 'from-fuchsia-600 to-purple-700' },
+      { id: 'gif-party', label: '🎉 Yay', emoji: '🎉', bg: 'from-amber-500 to-pink-500' }
+    ];
 
-        let user = users.find(u => u.username === username);
-        if(!user) {
-            user = { username, phone, following: [], followers: [], blocked: [] };
-            users.push(user);
-            localStorage.setItem('vb_users', JSON.stringify(users));
-        }
+    const state = {
+      authMode: 'signup',
+      currentUser: null,
+      activeView: 'home',
+      profileTab: 'posts',
+      createType: 'post',
+      draftMediaDataUrl: '',
+      draftMediaKind: '', // 'image' | 'video'
+      activeChatId: null,
+      clockOffsetMs: Number(localStorage.getItem(STORAGE_KEYS.clockOffset) || '0'),
+      cloudConnected: false,
+      db: null,
+      unsubs: [],
+      users: [],
+      posts: [],
+      reels: [],
+      stories: [],
+      notes: [],
+      chats: [],
+      customStickers: []
+    };
 
-        currentUser = user;
-        localStorage.setItem('vb_current_user', JSON.stringify(currentUser));
-        startAppSession();
+    function nowMs() {
+      return Date.now() + state.clockOffsetMs;
     }
 
-    function startAppSession() {
-        document.getElementById('auth-screen').classList.add('hidden');
-        document.getElementById('main-app').classList.remove('hidden');
-        if(currentUser.username === 'admin') {
-            document.getElementById('admin-nav-icon').classList.remove('hidden');
+    function isWithin24Hours(createdAt) {
+      return (nowMs() - Number(createdAt || 0)) < TWENTY_FOUR_HOURS_MS;
+    }
+
+    function formatRemaining24h(createdAt) {
+      const rem = TWENTY_FOUR_HOURS_MS - (nowMs() - Number(createdAt || 0));
+      if (rem <= 0) return 'Expired';
+      const hrs = Math.floor(rem / (60 * 60 * 1000));
+      const mins = Math.floor((rem % (60 * 60 * 1000)) / (60 * 1000));
+      return hrs > 0 ? `${hrs}h ${mins}m left` : `${mins}m left`;
+    }
+
+    function formatRelativeTime(ts) {
+      const diff = Math.max(0, nowMs() - Number(ts || 0));
+      const mins = Math.floor(diff / 60000);
+      if (mins < 1) return 'Just now';
+      if (mins < 60) return `${mins}m ago`;
+      const hrs = Math.floor(mins / 60);
+      if (hrs < 24) return `${hrs}h ago`;
+      const days = Math.floor(hrs / 24);
+      return `${days}d ago`;
+    }
+
+    function escapeHtml(str) {
+      return String(str || '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toastContainer');
+      const colors = {
+        info: 'bg-zinc-900 border-zinc-700 text-zinc-100',
+        success: 'bg-emerald-950/95 border-emerald-700/70 text-emerald-100',
+        error: 'bg-rose-950/95 border-rose-700/70 text-rose-100'
+      };
+      const el = document.createElement('div');
+      el.className = `px-4 py-2.5 rounded-xl border text-xs font-medium shadow-xl transition ${colors[type] || colors.info}`;
+      el.textContent = message;
+      container.appendChild(el);
+      setTimeout(() => {
+        el.style.opacity = '0';
+        setTimeout(() => el.remove(), 250);
+      }, 2800);
+    }
+
+    // --- SANDBOX STORAGE HELPERS (EMPTY BY DEFAULT) ---
+    function loadSandboxCollection(key) {
+      try {
+        const raw = localStorage.getItem(key);
+        const parsed = raw ? JSON.parse(raw) : [];
+        return Array.isArray(parsed) ? parsed : [];
+      } catch {
+        return [];
+      }
+    }
+
+    function saveSandboxCollection(key, data) {
+      localStorage.setItem(key, JSON.stringify(data));
+    }
+
+    function refreshSandboxState() {
+      state.users = loadSandboxCollection(STORAGE_KEYS.sandboxUsers);
+      state.posts = loadSandboxCollection(STORAGE_KEYS.sandboxPosts);
+      state.reels = loadSandboxCollection(STORAGE_KEYS.sandboxReels);
+      state.stories = loadSandboxCollection(STORAGE_KEYS.sandboxStories);
+      state.notes = loadSandboxCollection(STORAGE_KEYS.sandboxNotes);
+      state.chats = loadSandboxCollection(STORAGE_KEYS.sandboxChats);
+      state.customStickers = loadSandboxCollection(STORAGE_KEYS.sandboxStickers);
+      syncCurrentUserFromList();
+      renderAll();
+    }
+
+    function syncCurrentUserFromList() {
+      const sessionId = localStorage.getItem(STORAGE_KEYS.session);
+      if (!sessionId) {
+        state.currentUser = null;
+        return;
+      }
+      const found = state.users.find(u => u.id === sessionId);
+      state.currentUser = found || null;
+    }
+
+    // --- FIREBASE REAL-TIME SYNC ---
+    function clearSubscriptions() {
+      state.unsubs.forEach(fn => {
+        try { fn(); } catch {}
+      });
+      state.unsubs = [];
+    }
+
+    async function connectFirebase(configObj, silent = false) {
+      clearSubscriptions();
+      try {
+        for (const existingApp of getApps()) {
+          await deleteApp(existingApp);
         }
-        renderFeed();
-    }
+        const app = initializeApp(configObj);
+        const db = getFirestore(app);
+        state.db = db;
+        state.cloudConnected = true;
+        localStorage.setItem(STORAGE_KEYS.firebaseConfig, JSON.stringify(configObj));
+        updateSyncBadges();
 
-    function switchTab(tab) {
-        if(tab === 'feed') {
-            renderFeed();
-        } else if(tab === 'reels') {
-            renderReels();
-        }
-    }
-
-    function openCreateModal() {
-        document.getElementById('create-modal').classList.remove('hidden');
-    }
-
-    function closeCreateModal() {
-        document.getElementById('create-modal').classList.add('hidden');
-    }
-
-    function submitCreate() {
-        let type = document.getElementById('create-type').value;
-        let fileInput = document.getElementById('media-file-input');
-        let caption = document.getElementById('create-caption').value;
-
-        if(fileInput.files.length === 0) {
-            alert('Please select a file from your gallery.');
-            return;
-        }
-
-        let file = fileInput.files[0];
-        let reader = new FileReader();
-
-        reader.onload = function(e) {
-            let mediaUrl = e.target.result;
-
-            if(type === 'post') {
-                let newPost = {
-                    id: Date.now(),
-                    username: currentUser.username,
-                    mediaUrl: mediaUrl,
-                    mediaType: file.type.startsWith('video') ? 'video' : 'image',
-                    caption: caption,
-                    likes: [],
-                    comments: []
-                };
-                posts.unshift(newPost);
-                localStorage.setItem('vb_posts', JSON.stringify(posts));
-                renderFeed();
-            } else if(type === 'reel') {
-                let newReel = {
-                    id: Date.now(),
-                    username: currentUser.username,
-                    mediaUrl: mediaUrl,
-                    caption: caption,
-                    likes: []
-                };
-                reels.unshift(newReel);
-                localStorage.setItem('vb_reels', JSON.stringify(reels));
-            } else if(type === 'story') {
-                let newStory = {
-                    id: Date.now(),
-                    username: currentUser.username,
-                    mediaUrl: mediaUrl,
-                    timestamp: Date.now()
-                };
-                stories.push(newStory);
-                localStorage.setItem('vb_stories', JSON.stringify(stories));
-                renderFeed();
+        const watchCol = (colName, targetKey) => {
+          const unsub = onSnapshot(collection(db, colName), (snap) => {
+            const rows = [];
+            snap.forEach(d => rows.push({ id: d.id, ...d.data() }));
+            state[targetKey] = rows;
+            syncCurrentUserFromList();
+            if (state.currentUser && !state.currentUser.suspended) {
+              renderAll();
+            } else if (state.currentUser && state.currentUser.suspended) {
+              showToast('Your account was suspended by an admin.', 'error');
+              logoutUser();
             }
-
-            fileInput.value = '';
-            document.getElementById('create-caption').value = '';
-            closeCreateModal();
-            alert('Uploaded successfully!');
+          }, (err) => {
+            if (!silent) showToast(`Firestore error (${colName}): ${err.message}`, 'error');
+          });
+          state.unsubs.push(unsub);
         };
 
-        reader.readAsDataURL(file);
+        watchCol('users', 'users');
+        watchCol('posts', 'posts');
+        watchCol('reels', 'reels');
+        watchCol('stories', 'stories');
+        watchCol('notes', 'notes');
+        watchCol('chats', 'chats');
+        watchCol('stickers', 'customStickers');
+
+        if (!silent) {
+          showToast('Connected to Firebase Firestore live sync.', 'success');
+          closeModal('firebaseModal');
+        }
+      } catch (err) {
+        state.cloudConnected = false;
+        state.db = null;
+        updateSyncBadges();
+        refreshSandboxState();
+        if (!silent) showToast(`Connection failed: ${err.message}`, 'error');
+      }
     }
 
-    function renderFeed() {
-        cleanExpiredStories();
-        let container = document.getElementById('feed-container');
+    window.connectFirebaseFromModal = async function () {
+      const raw = document.getElementById('firebaseConfigInput').value.trim();
+      if (!raw) {
+        showToast('Paste your Firebase configuration JSON first.', 'error');
+        return;
+      }
+      try {
+        const parsed = JSON.parse(raw);
+        if (!parsed.apiKey || !parsed.projectId) {
+          showToast('Config must include at least apiKey and projectId.', 'error');
+          return;
+        }
+        await connectFirebase(parsed, false);
+      } catch {
+        showToast('Invalid JSON format in Firebase config.', 'error');
+      }
+    };
+
+    window.disconnectFirebase = async function () {
+      clearSubscriptions();
+      localStorage.removeItem(STORAGE_KEYS.firebaseConfig);
+      state.cloudConnected = false;
+      state.db = null;
+      for (const existingApp of getApps()) {
+        try { await deleteApp(existingApp); } catch {}
+      }
+      updateSyncBadges();
+      refreshSandboxState();
+      closeModal('firebaseModal');
+      showToast('Switched to Local Sandbox mode.', 'info');
+    };
+
+    window.openFirebaseModal = function () {
+      const saved = localStorage.getItem(STORAGE_KEYS.firebaseConfig);
+      if (saved) {
+        document.getElementById('firebaseConfigInput').value = JSON.stringify(JSON.parse(saved), null, 2);
+      }
+      document.getElementById('firebaseModal').classList.remove('hidden');
+    };
+
+    function updateSyncBadges() {
+      const label = state.cloudConnected ? 'Live Cloud' : 'Sandbox';
+      document.querySelectorAll('.sync-label').forEach(el => { el.textContent = label; });
+      const authDot = document.getElementById('authSyncDot');
+      const authLabel = document.getElementById('authSyncLabel');
+      if (authDot) authDot.className = `w-2 h-2 rounded-full ${state.cloudConnected ? 'bg-emerald-400' : 'bg-amber-400'}`;
+      if (authLabel) authLabel.textContent = label;
+
+      document.querySelectorAll('.desktop-sync-dot, .mobile-sync-dot').forEach(dot => {
+        dot.className = `${dot.className.split(' ').filter(c => !c.startsWith('bg-')).join(' ')} ${state.cloudConnected ? 'bg-emerald-400' : 'bg-amber-400'}`;
+      });
+    }
+
+    // --- DATA WRITE HELPERS ---
+    async function writeDoc(colName, id, payload) {
+      if (state.cloudConnected && state.db) {
+        await setDoc(doc(state.db, colName, id), payload, { merge: true });
+      } else {
+        const keyMap = {
+          users: STORAGE_KEYS.sandboxUsers,
+          posts: STORAGE_KEYS.sandboxPosts,
+          reels: STORAGE_KEYS.sandboxReels,
+          stories: STORAGE_KEYS.sandboxStories,
+          notes: STORAGE_KEYS.sandboxNotes,
+          chats: STORAGE_KEYS.sandboxChats,
+          stickers: STORAGE_KEYS.sandboxStickers
+        };
+        const storageKey = keyMap[colName];
+        const list = loadSandboxCollection(storageKey);
+        const idx = list.findIndex(item => item.id === id);
+        if (idx >= 0) {
+          list[idx] = { ...list[idx], ...payload, id };
+        } else {
+          list.push({ ...payload, id });
+        }
+        saveSandboxCollection(storageKey, list);
+        refreshSandboxState();
+      }
+    }
+
+    async function patchDoc(colName, id, patch) {
+      if (state.cloudConnected && state.db) {
+        await updateDoc(doc(state.db, colName, id), patch);
+      } else {
+        const keyMap = {
+          users: STORAGE_KEYS.sandboxUsers,
+          posts: STORAGE_KEYS.sandboxPosts,
+          reels: STORAGE_KEYS.sandboxReels,
+          stories: STORAGE_KEYS.sandboxStories,
+          notes: STORAGE_KEYS.sandboxNotes,
+          chats: STORAGE_KEYS.sandboxChats,
+          stickers: STORAGE_KEYS.sandboxStickers
+        };
+        const storageKey = keyMap[colName];
+        const list = loadSandboxCollection(storageKey);
+        const idx = list.findIndex(item => item.id === id);
+        if (idx >= 0) {
+          list[idx] = { ...list[idx], ...patch };
+          saveSandboxCollection(storageKey, list);
+          refreshSandboxState();
+        }
+      }
+    }
+
+    async function removeDoc(colName, id) {
+      if (state.cloudConnected && state.db) {
+        await deleteDoc(doc(state.db, colName, id));
+      } else {
+        const keyMap = {
+          users: STORAGE_KEYS.sandboxUsers,
+          posts: STORAGE_KEYS.sandboxPosts,
+          reels: STORAGE_KEYS.sandboxReels,
+          stories: STORAGE_KEYS.sandboxStories,
+          notes: STORAGE_KEYS.sandboxNotes,
+          chats: STORAGE_KEYS.sandboxChats,
+          stickers: STORAGE_KEYS.sandboxStickers
+        };
+        const storageKey = keyMap[colName];
+        const list = loadSandboxCollection(storageKey).filter(item => item.id !== id);
+        saveSandboxCollection(storageKey, list);
+        refreshSandboxState();
+      }
+    }
+
+    // --- AUTHENTICATION ---
+    window.setAuthTab = function (mode) {
+      state.authMode = mode;
+      const isSignup = mode === 'signup';
+      document.getElementById('displayNameField').classList.toggle('hidden', !isSignup);
+      document.getElementById('tabSignup').className = `py-2 text-xs font-semibold rounded-lg transition ${isSignup ? 'bg-purple-600 text-white' : 'text-zinc-400 hover:text-zinc-200'}`;
+      document.getElementById('tabLogin').className = `py-2 text-xs font-semibold rounded-lg transition ${!isSignup ? 'bg-purple-600 text-white' : 'text-zinc-400 hover:text-zinc-200'}`;
+      document.getElementById('authSubmitBtn').textContent = isSignup ? 'Create Account & Enter' : 'Log In';
+    };
+
+    window.handleAuthSubmit = async function (e) {
+      e.preventDefault();
+      const rawHandle = document.getElementById('authUsername').value.trim().toLowerCase().replace(/^@+/, '').replace(/[^a-z0-9._]/g, '');
+      const pin = document.getElementById('authPin').value;
+      const displayNameInput = document.getElementById('authDisplayName').value.trim();
+
+      if (!rawHandle) {
+        showToast('Enter a valid username (letters, numbers, dot, underscore).', 'error');
+        return;
+      }
+
+      const existing = state.users.find(u => u.username === rawHandle);
+
+      if (state.authMode === 'signup') {
+        if (existing) {
+          showToast(`Username @${rawHandle} is already taken. Try logging in.`, 'error');
+          return;
+        }
+        const isFirstUser = state.users.length === 0;
+        const isAdmin = isFirstUser || rawHandle === 'admin';
+        const userId = 'usr_' + rawHandle;
+        const newUser = {
+          id: userId,
+          username: rawHandle,
+          displayName: displayNameInput || rawHandle,
+          pin,
+          bio: '',
+          role: isAdmin ? 'admin' : 'user',
+          suspended: false,
+          createdAt: Date.now()
+        };
+        await writeDoc('users', userId, newUser);
+        localStorage.setItem(STORAGE_KEYS.session, userId);
+        state.currentUser = newUser;
+        showToast(isAdmin ? `Welcome @${rawHandle}! Admin privileges enabled.` : `Welcome @${rawHandle}!`, 'success');
+        enterApp();
+      } else {
+        if (!existing) {
+          showToast(`Account @${rawHandle} not found. Create an account first.`, 'error');
+          return;
+        }
+        if (existing.pin !== pin) {
+          showToast('Incorrect passcode.', 'error');
+          return;
+        }
+        if (existing.suspended) {
+          showToast('This account has been suspended by an admin.', 'error');
+          return;
+        }
+        localStorage.setItem(STORAGE_KEYS.session, existing.id);
+        state.currentUser = existing;
+        showToast(`Signed in as @${existing.username}`, 'success');
+        enterApp();
+      }
+    };
+
+    window.logoutUser = function () {
+      localStorage.removeItem(STORAGE_KEYS.session);
+      state.currentUser = null;
+      document.getElementById('mainApp').classList.add('hidden');
+      document.getElementById('authScreen').classList.remove('hidden');
+      document.getElementById('authForm').reset();
+    };
+
+    window.openSwitchAccountModal = function () {
+      const container = document.getElementById('switchAccountList');
+      const others = state.users.filter(u => !u.suspended);
+      if (!others.length) {
+        container.innerHTML = '<p class="text-xs text-zinc-400 text-center py-4">No other accounts registered yet.</p>';
+      } else {
+        container.innerHTML = others.map(u => {
+          const active = state.currentUser && state.currentUser.id === u.id;
+          return `
+            <button onclick="switchToUser('${u.id}')" class="w-full flex items-center justify-between p-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border ${active ? 'border-purple-500/70' : 'border-zinc-800'} text-left transition">
+              <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center text-xs font-bold">${escapeHtml((u.displayName || u.username)[0].toUpperCase())}</div>
+                <div>
+                  <div class="text-xs font-semibold">${escapeHtml(u.displayName || u.username)} ${u.role === 'admin' ? '<span class="text-[10px] text-purple-300">• Admin</span>' : ''}</div>
+                  <div class="text-[11px] text-zinc-400">@${escapeHtml(u.username)}</div>
+                </div>
+              </div>
+              <span class="text-[11px] text-zinc-400">${active ? 'Current' : 'Switch'}</span>
+            </button>
+          `;
+        }).join('');
+      }
+      document.getElementById('switchAccountModal').classList.remove('hidden');
+    };
+
+    window.switchToUser = function (userId) {
+      const target = state.users.find(u => u.id === userId && !u.suspended);
+      if (!target) return;
+      localStorage.setItem(STORAGE_KEYS.session, target.id);
+      state.currentUser = target;
+      closeModal('switchAccountModal');
+      showToast(`Switched to @${target.username}`, 'info');
+      renderAll();
+    };
+
+    function enterApp() {
+      document.getElementById('authScreen').classList.add('hidden');
+      document.getElementById('mainApp').classList.remove('hidden');
+      updateClockOffsetLabel();
+      renderAll();
+    }
+
+    // --- CLOCK OFFSET FOR TESTING 24H EXPIRATION ---
+    window.simulatePlus24Hours = function () {
+      state.clockOffsetMs += TWENTY_FOUR_HOURS_MS;
+      localStorage.setItem(STORAGE_KEYS.clockOffset, String(state.clockOffsetMs));
+      updateClockOffsetLabel();
+      showToast('Simulated +24 hours: Stories & Notes expired; Reels & Posts remain permanent.', 'info');
+      renderAll();
+    };
+
+    window.resetClockOffset = function () {
+      state.clockOffsetMs = 0;
+      localStorage.setItem(STORAGE_KEYS.clockOffset, '0');
+      updateClockOffsetLabel();
+      showToast('Clock reset to real time.', 'info');
+      renderAll();
+    };
+
+    function updateClockOffsetLabel() {
+      const hours = Math.round(state.clockOffsetMs / (60 * 60 * 1000));
+      document.getElementById('clockOffsetLabel').textContent = hours >= 0 ? `+${hours}h` : `${hours}h`;
+    }
+
+    // --- NAVIGATION ---
+    window.switchView = function (viewName) {
+      if (viewName === 'admin' && (!state.currentUser || state.currentUser.role !== 'admin')) {
+        showToast('Admin access only.', 'error');
+        return;
+      }
+      state.activeView = viewName;
+      document.querySelectorAll('.app-view').forEach(sec => sec.classList.add('hidden'));
+      document.getElementById(`view-${viewName}`).classList.remove('hidden');
+
+      document.querySelectorAll('.nav-btn').forEach(btn => {
+        const isMatch = btn.getAttribute('data-nav') === viewName;
+        if (btn.closest('aside')) {
+          btn.className = `nav-btn w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition ${isMatch ? 'bg-elevated text-white' : 'text-zinc-400 hover:text-white hover:bg-zinc-900'}`;
+        } else if (btn.closest('nav')) {
+          btn.className = `nav-btn flex flex-col items-center py-1 px-2.5 rounded-xl text-[11px] transition ${isMatch ? 'text-white font-semibold' : 'text-zinc-400'}`;
+        }
+      });
+      renderAll();
+    };
+
+    window.closeModal = function (id) {
+      document.getElementById(id).classList.add('hidden');
+    };
+
+    // --- CREATE POST / PERMANENT REEL / 24H STORY ---
+    window.openCreateModal = function (type = 'post') {
+      state.draftMediaDataUrl = '';
+      state.draftMediaKind = '';
+      document.getElementById('createFileInput').value = '';
+      document.getElementById('createMediaUrl').value = '';
+      document.getElementById('createCaption').value = '';
+      document.getElementById('createPreviewBox').classList.add('hidden');
+      document.getElementById('createPreviewContent').innerHTML = '';
+      setCreateType(type);
+      document.getElementById('createModal').classList.remove('hidden');
+    };
+
+    window.setCreateType = function (type) {
+      state.createType = type;
+      ['post', 'reel', 'story'].forEach(t => {
+        const btn = document.getElementById(`createType-${t}`);
+        btn.className = t === type
+          ? 'py-1.5 rounded-lg text-xs font-semibold bg-elevated text-white'
+          : 'py-1.5 rounded-lg text-xs font-medium text-zinc-400 hover:text-white';
+      });
+      const titleMap = {
+        post: 'Create Permanent Post',
+        reel: 'Create Permanent Reel',
+        story: 'Create 24-Hour Story'
+      };
+      const subMap = {
+        post: 'Stays permanently in the feed and on your profile.',
+        reel: 'Never expires after 24 hours — permanently visible in Reels.',
+        story: 'Automatically disappears after 24 hours.'
+      };
+      document.getElementById('createModalTitle').textContent = titleMap[type];
+      document.getElementById('createModalSubtitle').textContent = subMap[type];
+    };
+
+    window.handleMediaFileSelect = function (e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      if (file.size > 12 * 1024 * 1024) {
+        showToast('Please choose a file under 12 MB or paste a media URL.', 'error');
+        return;
+      }
+      state.draftMediaKind = file.type.startsWith('video/') ? 'video' : 'image';
+      const reader = new FileReader();
+      reader.onload = () => {
+        state.draftMediaDataUrl = reader.result;
+        renderCreatePreview();
+      };
+      reader.readAsDataURL(file);
+    };
+
+    window.handleMediaUrlInput = function (e) {
+      const url = e.target.value.trim();
+      if (!url) {
+        if (!document.getElementById('createFileInput').files.length) {
+          state.draftMediaDataUrl = '';
+          state.draftMediaKind = '';
+          renderCreatePreview();
+        }
+        return;
+      }
+      state.draftMediaDataUrl = url;
+      state.draftMediaKind = /\.(mp4|webm|ogg|mov)(\?|$)/i.test(url) ? 'video' : 'image';
+      renderCreatePreview();
+    };
+
+    function renderCreatePreview() {
+      const box = document.getElementById('createPreviewBox');
+      const content = document.getElementById('createPreviewContent');
+      if (!state.draftMediaDataUrl) {
+        box.classList.add('hidden');
+        content.innerHTML = '';
+        return;
+      }
+      box.classList.remove('hidden');
+      if (state.draftMediaKind === 'video') {
+        content.innerHTML = `<video src="${escapeHtml(state.draftMediaDataUrl)}" controls class="max-h-52 rounded-lg"></video>`;
+      } else {
+        content.innerHTML = `<img src="${escapeHtml(state.draftMediaDataUrl)}" alt="Preview" class="max-h-52 object-contain rounded-lg" />`;
+      }
+    }
+
+    window.handleCreateSubmit = async function (e) {
+      e.preventDefault();
+      if (!state.currentUser) return;
+      const caption = document.getElementById('createCaption').value.trim();
+      const mediaUrl = state.draftMediaDataUrl;
+
+      if (!caption && !mediaUrl) {
+        showToast('Add a photo/video, URL, or caption first.', 'error');
+        return;
+      }
+
+      const id = `${state.createType}_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+      const payload = {
+        id,
+        authorId: state.currentUser.id,
+        authorUsername: state.currentUser.username,
+        authorName: state.currentUser.displayName || state.currentUser.username,
+        caption,
+        mediaUrl: mediaUrl || '',
+        mediaKind: mediaUrl ? (state.draftMediaKind || 'image') : 'text',
+        createdAt: nowMs()
+      };
+
+      if (state.createType === 'post') {
+        payload.likes = [];
+        payload.comments = [];
+        await writeDoc('posts', id, payload);
+        showToast('Published permanent Post.', 'success');
+        closeModal('createModal');
+        switchView('home');
+      } else if (state.createType === 'reel') {
+        payload.likes = [];
+        payload.comments = [];
+        await writeDoc('reels', id, payload);
+        showToast('Published permanent Reel (never expires).', 'success');
+        closeModal('createModal');
+        switchView('reels');
+      } else {
+        payload.expiresAt = nowMs() + TWENTY_FOUR_HOURS_MS;
+        payload.seenBy = [state.currentUser.id];
+        await writeDoc('stories', id, payload);
+        showToast('Published 24-hour Story.', 'success');
+        closeModal('createModal');
+        switchView('home');
+      }
+    };
+
+    // --- STORY VIEWER (STRICTLY < 24H) ---
+    window.openStoryViewer = async function (storyId) {
+      const activeStories = state.stories.filter(s => isWithin24Hours(s.createdAt));
+      const story = activeStories.find(s => s.id === storyId);
+      if (!story) {
+        showToast('This story has expired (24h limit).', 'info');
+        renderAll();
+        return;
+      }
+
+      if (state.currentUser && !(story.seenBy || []).includes(state.currentUser.id)) {
+        await patchDoc('stories', story.id, {
+          seenBy: arrayUnion(state.currentUser.id)
+        });
+        if (!state.cloudConnected) {
+          const list = loadSandboxCollection(STORAGE_KEYS.sandboxStories).map(s =>
+            s.id === story.id ? { ...s, seenBy: Array.from(new Set([...(s.seenBy || []), state.currentUser.id])) } : s
+          );
+          saveSandboxCollection(STORAGE_KEYS.sandboxStories, list);
+          refreshSandboxState();
+        }
+      }
+
+      document.getElementById('storyViewerAuthor').innerHTML = `
+        <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center text-xs font-bold">${escapeHtml((story.authorName || story.authorUsername || '?')[0].toUpperCase())}</div>
+        <div>
+          <div class="text-xs font-semibold">${escapeHtml(story.authorName || story.authorUsername)}</div>
+          <div class="text-[11px] text-zinc-400">@${escapeHtml(story.authorUsername)}</div>
+        </div>
+      `;
+      document.getElementById('storyViewerExpiry').textContent = formatRemaining24h(story.createdAt);
+
+      let mediaHtml = '';
+      if (story.mediaUrl) {
+        mediaHtml = story.mediaKind === 'video'
+          ? `<video src="${escapeHtml(story.mediaUrl)}" controls autoplay class="max-h-72 rounded-xl mb-3"></video>`
+          : `<img src="${escapeHtml(story.mediaUrl)}" alt="Story" class="max-h-72 object-contain rounded-xl mb-3" />`;
+      }
+      const captionHtml = story.caption
+        ? `<p class="text-sm text-zinc-100 px-2">${escapeHtml(story.caption)}</p>`
+        : (!story.mediaUrl ? '<p class="text-sm text-zinc-400">Empty story</p>' : '');
+
+      const canDelete = state.currentUser && (state.currentUser.id === story.authorId || state.currentUser.role === 'admin');
+      const deleteHtml = canDelete
+        ? `<button onclick="deleteItem('stories', '${story.id}'); closeModal('storyViewerModal');" class="mt-4 text-xs text-rose-400 hover:text-rose-300">Delete Story</button>`
+        : '';
+
+      document.getElementById('storyViewerBody').innerHTML = `${mediaHtml}${captionHtml}${deleteHtml}`;
+      document.getElementById('storyViewerModal').classList.remove('hidden');
+    };
+
+    // --- POSTS & PERMANENT REELS ACTIONS ---
+    window.toggleLike = async function (colName, itemId) {
+      if (!state.currentUser) return;
+      const list = colName === 'posts' ? state.posts : state.reels;
+      const item = list.find(x => x.id === itemId);
+      if (!item) return;
+      const likes = Array.isArray(item.likes) ? item.likes : [];
+      const alreadyLiked = likes.includes(state.currentUser.id);
+      const nextLikes = alreadyLiked
+        ? likes.filter(id => id !== state.currentUser.id)
+        : [...likes, state.currentUser.id];
+
+      if (state.cloudConnected && state.db) {
+        await patchDoc(colName, itemId, {
+          likes: alreadyLiked ? arrayRemove(state.currentUser.id) : arrayUnion(state.currentUser.id)
+        });
+      } else {
+        await patchDoc(colName, itemId, { likes: nextLikes });
+      }
+    };
+
+    window.addComment = async function (event, colName, itemId) {
+      event.preventDefault();
+      if (!state.currentUser) return;
+      const input = document.getElementById(`comment-input-${colName}-${itemId}`);
+      const text = input ? input.value.trim() : '';
+      if (!text) return;
+
+      const list = colName === 'posts' ? state.posts : state.reels;
+      const item = list.find(x => x.id === itemId);
+      if (!item) return;
+
+      const newComment = {
+        id: 'cmt_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        authorId: state.currentUser.id,
+        authorUsername: state.currentUser.username,
+        text,
+        createdAt: nowMs()
+      };
+      const updatedComments = [...(item.comments || []), newComment];
+
+      if (state.cloudConnected && state.db) {
+        await patchDoc(colName, itemId, { comments: arrayUnion(newComment) });
+      } else {
+        await patchDoc(colName, itemId, { comments: updatedComments });
+      }
+      if (input) input.value = '';
+    };
+
+    window.deleteItem = async function (colName, itemId) {
+      if (!state.currentUser) return;
+      const list = state[colName] || [];
+      const item = list.find(x => x.id === itemId);
+      if (!item) return;
+      const allowed = state.currentUser.id === item.authorId || state.currentUser.role === 'admin';
+      if (!allowed) {
+        showToast('You can only delete your own items.', 'error');
+        return;
+      }
+      await removeDoc(colName, itemId);
+      showToast('Deleted.', 'info');
+    };
+
+    // --- 24H EXPIRING NOTES ---
+    window.openNoteModal = function () {
+      const existingMine = state.notes.find(n => n.authorId === state.currentUser?.id && isWithin24Hours(n.createdAt));
+      document.getElementById('noteTextInput').value = existingMine ? existingMine.text : '';
+      document.getElementById('noteModal').classList.remove('hidden');
+    };
+
+    window.handleNoteSubmit = async function (e) {
+      e.preventDefault();
+      if (!state.currentUser) return;
+      const text = document.getElementById('noteTextInput').value.trim();
+      if (!text) return;
+      const noteId = `note_${state.currentUser.id}`;
+      await writeDoc('notes', noteId, {
+        id: noteId,
+        authorId: state.currentUser.id,
+        authorUsername: state.currentUser.username,
+        authorName: state.currentUser.displayName || state.currentUser.username,
+        text,
+        createdAt: nowMs(),
+        expiresAt: nowMs() + TWENTY_FOUR_HOURS_MS
+      });
+      closeModal('noteModal');
+      showToast('Set 24-hour Note.', 'success');
+    };
+
+    window.deleteMyNote = async function () {
+      if (!state.currentUser) return;
+      await removeDoc('notes', `note_${state.currentUser.id}`);
+      showToast('Removed your Note.', 'info');
+    };
+
+    // --- CHATS, STICKERS & GIFS ---
+    window.openNewChatModal = function () {
+      if (!state.currentUser) return;
+      document.getElementById('newChatTitle').value = '';
+      const peers = state.users.filter(u => u.id !== state.currentUser.id && !u.suspended);
+      const box = document.getElementById('newChatUserCheckboxes');
+      if (!peers.length) {
+        box.innerHTML = '<p class="text-xs text-zinc-400">No other registered users yet. Create another account to chat.</p>';
+      } else {
+        box.innerHTML = peers.map(u => `
+          <label class="flex items-center gap-2.5 p-1.5 rounded-lg hover:bg-zinc-800/60 cursor-pointer text-xs">
+            <input type="checkbox" value="${u.id}" class="chat-peer-cb rounded accent-purple-500" />
+            <span class="font-medium">${escapeHtml(u.displayName || u.username)}</span>
+            <span class="text-zinc-400">@${escapeHtml(u.username)}</span>
+          </label>
+        `).join('');
+      }
+      document.getElementById('newChatModal').classList.remove('hidden');
+    };
+
+    window.handleCreateChat = async function (e) {
+      e.preventDefault();
+      if (!state.currentUser) return;
+      const checked = Array.from(document.querySelectorAll('.chat-peer-cb:checked')).map(cb => cb.value);
+      if (!checked.length) {
+        showToast('Select at least one user to chat with.', 'error');
+        return;
+      }
+      const members = Array.from(new Set([state.currentUser.id, ...checked])).sort();
+      const customTitle = document.getElementById('newChatTitle').value.trim();
+      const chatId = customTitle
+        ? `grp_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`
+        : `dm_${members.join('__')}`;
+
+      const existing = state.chats.find(c => c.id === chatId);
+      if (!existing) {
+        await writeDoc('chats', chatId, {
+          id: chatId,
+          title: customTitle || '',
+          members,
+          messages: [],
+          createdAt: nowMs(),
+          updatedAt: nowMs()
+        });
+      }
+      state.activeChatId = chatId;
+      closeModal('newChatModal');
+      renderChats();
+    };
+
+    window.selectChat = function (chatId) {
+      state.activeChatId = chatId;
+      renderChats();
+    };
+
+    window.toggleChatExtras = function () {
+      const drawer = document.getElementById('chatExtrasDrawer');
+      drawer.classList.toggle('hidden');
+      renderStickerPicker();
+    };
+
+    function renderStickerPicker() {
+      const grid = document.getElementById('stickerPickerGrid');
+      const builtinHtml = BUILTIN_GIF_STICKERS.map(s => `
+        <button type="button" onclick="sendStickerOrGif('${escapeHtml(s.emoji)}', '${escapeHtml(s.label)}', '')" class="px-2.5 py-1.5 rounded-lg bg-gradient-to-r ${s.bg} text-white text-xs font-semibold shadow-sm hover:opacity-95 transition">
+          ${s.emoji} ${s.label.split(' ')[1] || s.label}
+        </button>
+      `).join('');
+
+      const customHtml = state.customStickers.map(cs => `
+        <button type="button" onclick="sendStickerOrGif('', 'Custom Sticker', '${escapeHtml(cs.dataUrl)}')" class="p-1 rounded-lg bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 transition" title="Custom Sticker">
+          <img src="${escapeHtml(cs.dataUrl)}" alt="Sticker" class="w-9 h-9 object-contain" />
+        </button>
+      `).join('');
+
+      grid.innerHTML = builtinHtml + customHtml;
+    }
+
+    window.sendStickerOrGif = async function (emoji, label, imageUrl) {
+      if (!state.currentUser || !state.activeChatId) {
+        showToast('Select or start a chat first.', 'error');
+        return;
+      }
+      await appendMessageToChat(state.activeChatId, {
+        id: 'msg_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        senderId: state.currentUser.id,
+        senderUsername: state.currentUser.username,
+        kind: imageUrl ? 'custom_sticker' : 'gif_sticker',
+        text: label,
+        emoji,
+        mediaUrl: imageUrl,
+        createdAt: nowMs()
+      });
+    };
+
+    window.handleSendMessage = async function (e) {
+      e.preventDefault();
+      if (!state.currentUser || !state.activeChatId) {
+        showToast('Select or start a chat first.', 'error');
+        return;
+      }
+      const input = document.getElementById('chatMessageInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      await appendMessageToChat(state.activeChatId, {
+        id: 'msg_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6),
+        senderId: state.currentUser.id,
+        senderUsername: state.currentUser.username,
+        kind: 'text',
+        text,
+        createdAt: nowMs()
+      });
+      input.value = '';
+    };
+
+    async function appendMessageToChat(chatId, msg) {
+      const chat = state.chats.find(c => c.id === chatId);
+      if (!chat) return;
+      const nextMessages = [...(chat.messages || []), msg];
+      if (state.cloudConnected && state.db) {
+        await patchDoc('chats', chatId, {
+          messages: arrayUnion(msg),
+          updatedAt: nowMs()
+        });
+      } else {
+        await patchDoc('chats', chatId, {
+          messages: nextMessages,
+          updatedAt: nowMs()
+        });
+      }
+    }
+
+    // --- HTML5 CANVAS STICKER STUDIO ---
+    let drawing = false;
+    function initStickerCanvas() {
+      const canvas = document.getElementById('stickerCanvas');
+      const ctx = canvas.getContext('2d');
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.lineWidth = 6;
+
+      const getPos = (evt) => {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = evt.touches ? evt.touches[0].clientX : evt.clientX;
+        const clientY = evt.touches ? evt.touches[0].clientY : evt.clientY;
+        return {
+          x: ((clientX - rect.left) / rect.width) * canvas.width,
+          y: ((clientY - rect.top) / rect.height) * canvas.height
+        };
+      };
+
+      const start = (evt) => {
+        evt.preventDefault();
+        drawing = true;
+        ctx.strokeStyle = document.getElementById('stickerColor').value;
+        const pos = getPos(evt);
+        ctx.beginPath();
+        ctx.moveTo(pos.x, pos.y);
+      };
+
+      const move = (evt) => {
+        if (!drawing) return;
+        evt.preventDefault();
+        const pos = getPos(evt);
+        ctx.lineTo(pos.x, pos.y);
+        ctx.stroke();
+      };
+
+      const end = () => { drawing = false; };
+
+      canvas.addEventListener('mousedown', start);
+      canvas.addEventListener('mousemove', move);
+      window.addEventListener('mouseup', end);
+      canvas.addEventListener('touchstart', start, { passive: false });
+      canvas.addEventListener('touchmove', move, { passive: false });
+      window.addEventListener('touchend', end);
+    }
+
+    window.openStickerStudio = function () {
+      clearStickerCanvas();
+      document.getElementById('stickerModal').classList.remove('hidden');
+    };
+
+    window.clearStickerCanvas = function () {
+      const canvas = document.getElementById('stickerCanvas');
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    };
+
+    window.saveCustomSticker = async function () {
+      if (!state.currentUser) return;
+      const canvas = document.getElementById('stickerCanvas');
+      const dataUrl = canvas.toDataURL('image/png');
+      const stickerId = 'stk_' + Date.now() + '_' + Math.random().toString(36).slice(2, 6);
+      await writeDoc('stickers', stickerId, {
+        id: stickerId,
+        authorId: state.currentUser.id,
+        dataUrl,
+        createdAt: nowMs()
+      });
+      closeModal('stickerModal');
+      renderStickerPicker();
+      if (state.activeChatId) {
+        await sendStickerOrGif('', 'Custom Sticker', dataUrl);
+      } else {
+        showToast('Custom sticker saved to drawer.', 'success');
+      }
+    };
+
+    // --- ADMIN MODERATION ---
+    window.toggleSuspendUser = async function (userId) {
+      if (!state.currentUser || state.currentUser.role !== 'admin') return;
+      if (userId === state.currentUser.id) {
+        showToast('You cannot suspend your own active admin account.', 'error');
+        return;
+      }
+      const target = state.users.find(u => u.id === userId);
+      if (!target) return;
+      await patchDoc('users', userId, { suspended: !target.suspended });
+      showToast(`${target.suspended ? 'Reinstated' : 'Suspended'} @${target.username}`, 'info');
+    };
+
+    // --- RENDERING ---
+    function renderAll() {
+      if (!state.currentUser) return;
+      renderSidebarUser();
+      renderAdminVisibility();
+      renderStoriesBar();
+      renderPostsFeed();
+      renderReelsSection();
+      renderNotesBar();
+      renderChats();
+      if (state.activeView === 'profile') renderProfile();
+      if (state.activeView === 'admin') renderAdminPanel();
+    }
+
+    function renderSidebarUser() {
+      const u = state.currentUser;
+      if (!u) return;
+      document.getElementById('sidebarCurrentUser').innerHTML = `
+        <div class="flex items-center gap-2.5 min-w-0">
+          <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center text-xs font-bold shrink-0">${escapeHtml((u.displayName || u.username)[0].toUpperCase())}</div>
+          <div class="min-w-0">
+            <div class="text-xs font-semibold truncate">${escapeHtml(u.displayName || u.username)}</div>
+            <div class="text-[11px] text-zinc-400 truncate">@${escapeHtml(u.username)} ${u.role === 'admin' ? '• Admin' : ''}</div>
+          </div>
+        </div>
+      `;
+    }
+
+    function renderAdminVisibility() {
+      const isAdmin = state.currentUser && state.currentUser.role === 'admin';
+      document.getElementById('adminNavBtn').classList.toggle('hidden', !isAdmin);
+    }
+
+    function renderStoriesBar() {
+      const bar = document.getElementById('storiesBar');
+      const activeStories = state.stories
+        .filter(s => isWithin24Hours(s.createdAt))
+        .sort((a, b) => Number(b.createdAt) - Number(a.createdAt));
+
+      const addTile = `
+        <button onclick="openCreateModal('story')" class="flex flex-col items-center gap-1.5 shrink-0 w-16 group">
+          <div class="w-14 h-14 rounded-full bg-zinc-900 border border-dashed border-zinc-700 group-hover:border-purple-500 flex items-center justify-center text-lg text-purple-400 transition">+</div>
+          <span class="text-[11px] text-zinc-300 truncate w-full text-center">Your Story</span>
+        </button>
+      `;
+
+      if (!activeStories.length) {
+        bar.innerHTML = addTile + `
+          <div class="text-xs text-zinc-500 pl-2">
+            No active 24-hour stories yet. Stories appear here when users post and vanish automatically after 24 hours.
+          </div>
+        `;
+        return;
+      }
+
+      const storyTiles = activeStories.map(s => {
+        const seen = state.currentUser && Array.isArray(s.seenBy) && s.seenBy.includes(state.currentUser.id);
+        const ringClass = seen ? 'story-ring-seen' : 'story-ring-active';
+        return `
+          <button onclick="openStoryViewer('${s.id}')" class="flex flex-col items-center gap-1 shrink-0 w-16 group">
+            <div class="w-14 h-14 rounded-full ${ringClass}">
+              <div class="w-full h-full rounded-full bg-zinc-950 flex items-center justify-center text-sm font-bold text-white">
+                ${escapeHtml((s.authorName || s.authorUsername || '?')[0].toUpperCase())}
+              </div>
+            </div>
+            <span class="text-[11px] text-zinc-200 truncate w-full text-center">@${escapeHtml(s.authorUsername)}</span>
+            <span class="text-[10px] text-zinc-500 truncate w-full text-center">${formatRemaining24h(s.createdAt)}</span>
+          </button>
+        `;
+      }).join('');
+
+      bar.innerHTML = addTile + storyTiles;
+    }
+
+    function renderPostsFeed() {
+      const container = document.getElementById('postsFeed');
+      const sorted = [...state.posts].sort((a, b) => Number(b.createdAt) - Number(a.createdAt));
+
+      if (!sorted.length) {
         container.innerHTML = `
-            <div class="stories-bar" id="stories-bar">
-                <div class="story-item" onclick="openCreateStory()">
-                    <div class="story-ring seen" style="border: 2px dashed #dbdbdb;">
-                        <img src="https://via.placeholder.com/60" class="story-thumb">
-                    </div>
-                    <span>Your Story</span>
-                </div>
-            </div>
-            <div id="posts-feed"></div>
+          <div class="bg-surface border border-zinc-800/80 rounded-2xl p-10 text-center space-y-2">
+            <div class="text-2xl">✨</div>
+            <div class="text-sm font-semibold text-zinc-200">No posts yet</div>
+            <p class="text-xs text-zinc-400 max-w-sm mx-auto">
+              This feed starts completely empty. Create the first post — posts are permanent and never expire after 24 hours.
+            </p>
+            <button onclick="openCreateModal('post')" class="mt-2 px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-xs font-semibold text-white transition">Create First Post</button>
+          </div>
         `;
-        renderStories();
+        return;
+      }
 
-        let postsDiv = document.getElementById('posts-feed');
-        let visiblePosts = posts.filter(p => p.username === currentUser.username || (currentUser.following && currentUser.following.includes(p.username)));
-
-        if(visiblePosts.length === 0) {
-            postsDiv.innerHTML = `<div style="text-align:center; padding:40px; color:#8e8e8e;">Your feed is empty. Follow users via the 🔍 Explore tab or add your own post!</div>`;
-            return;
-        }
-
-        visiblePosts.forEach(post => {
-            let isLiked = post.likes.includes(currentUser.username);
-            let postEl = document.createElement('div');
-            postEl.className = 'post';
-            postEl.innerHTML = `
-                <div class="post-header">
-                    <div class="post-user">
-                        <img src="https://via.placeholder.com/32" alt="">
-                        <span>${post.username}</span>
-                    </div>
-                    <span style="cursor:pointer;" onclick="reportPost(${post.id})">⋮</span>
-                </div>
-                <div class="post-media">
-                    ${post.mediaType === 'video' ? `<video src="${post.mediaUrl}" controls></video>` : `<img src="${post.mediaUrl}" alt="">`}
-                </div>
-                <div class="post-actions">
-                    <div>
-                        <span onclick="likePost(${post.id})">${isLiked ? '❤️' : '🤍'}</span>
-                        <span onclick="focusComment(${post.id})">💬</span>
-                    </div>
-                    <span onclick="blockUser('${post.username}')" style="font-size:14px; color:#ed4956; cursor:pointer;">Block</span>
-                </div>
-                <div class="post-likes">${post.likes.length} likes</div>
-                <div class="post-caption"><span>${post.username}</span>${post.caption}</div>
-                <div class="post-comments-section" id="comments-${post.id}">
-                    ${post.comments.map(c => `<div class="comment-item"><b>${c.user}</b>${c.text}</div>`).join('')}
-                </div>
-                <div class="comment-input-box">
-                    <input type="text" id="comment-input-${post.id}" placeholder="Add a comment...">
-                    <button onclick="addComment(${post.id})">Post</button>
-                </div>
-            `;
-            postsDiv.appendChild(postEl);
-        });
+      container.innerHTML = sorted.map(p => renderFeedCard('posts', p)).join('');
     }
 
-    function renderStories() {
-        let bar = document.getElementById('stories-bar');
-        if(!bar) return;
-        
-        let uniqueUsers = [...new Set(stories.map(s => s.username))];
-        uniqueUsers.forEach(username => {
-            if(username === currentUser.username || (currentUser.following && currentUser.following.includes(username))) {
-                let userStories = stories.filter(s => s.username === username);
-                if(userStories.length > 0) {
-                    let item = document.createElement('div');
-                    item.className = 'story-item';
-                    item.onclick = () => viewUserStories(username);
-                    item.innerHTML = `
-                        <div class="story-ring">
-                            <img src="https://via.placeholder.com/60" class="story-thumb">
-                        </div>
-                        <span>${username}</span>
-                    `;
-                    bar.appendChild(item);
-                }
-            }
-        });
-    }
+    function renderReelsSection() {
+      const container = document.getElementById('reelsContainer');
+      const sorted = [...state.reels].sort((a, b) => Number(b.createdAt) - Number(a.createdAt));
 
-    function viewUserStories(username) {
-        let userStories = stories.filter(s => s.username === username);
-        if(userStories.length === 0) return;
-
-        let viewer = document.getElementById('story-viewer');
-        let mediaContainer = document.getElementById('story-viewer-media-container');
-        document.getElementById('story-viewer-user').innerText = username;
-
-        function showStory(idx) {
-            if(idx >= userStories.length) {
-                closeStoryViewer();
-                return;
-            }
-            let s = userStories[idx];
-            mediaContainer.innerHTML = s.mediaUrl.startsWith('data:video') ? `<video src="${s.mediaUrl}" autoplay controls></video>` : `<img src="${s.mediaUrl}">`;
-            
-            setTimeout(() => {
-                showStory(idx + 1);
-            }, 5000);
-        }
-
-        viewer.classList.remove('hidden');
-        showStory(0);
-    }
-
-    function closeStoryViewer() {
-        document.getElementById('story-viewer').classList.add('hidden');
-    }
-
-    function openCreateStory() {
-        document.getElementById('create-type').value = 'story';
-        openCreateModal();
-    }
-
-    function openExplore() {
-        document.getElementById('explore-modal').classList.remove('hidden');
-        let list = document.getElementById('explore-users-list');
-        list.innerHTML = '';
-
-        let otherUsers = users.filter(u => u.username !== currentUser.username);
-        if(otherUsers.length === 0) {
-            list.innerHTML = `<p style="text-align:center; color:#8e8e8e;">No other users registered yet.</p>`;
-            return;
-        }
-
-        otherUsers.forEach(u => {
-            let isFollowing = currentUser.following && currentUser.following.includes(u.username);
-            list.innerHTML += `
-                <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 0; border-bottom:1px solid #efefef;">
-                    <div style="display:flex; align-items:center; gap:12px;">
-                        <img src="https://via.placeholder.com/40" style="border-radius:50%;">
-                        <b>${u.username}</b>
-                    </div>
-                    <button onclick="toggleFollow('${u.username}')" style="background:${isFollowing ? '#dbdbdb' : '#0095f6'}; color:${isFollowing ? '#262626' : '#fff'}; border:none; padding:6px 16px; border-radius:6px; font-weight:600; cursor:pointer;">
-                        ${isFollowing ? 'Following' : 'Follow'}
-                    </button>
-                </div>
-            `;
-        });
-    }
-
-    function closeExplore() {
-        document.getElementById('explore-modal').classList.add('hidden');
-        renderFeed();
-    }
-
-    function toggleFollow(username) {
-        if(!currentUser.following) currentUser.following = [];
-        let idx = currentUser.following.indexOf(username);
-        if(idx > -1) {
-            currentUser.following.splice(idx, 1);
-        } else {
-            currentUser.following.push(username);
-        }
-
-        let targetUser = users.find(u => u.username === username);
-        if(targetUser) {
-            if(!targetUser.followers) targetUser.followers = [];
-            let fIdx = targetUser.followers.indexOf(currentUser.username);
-            if(idx > -1 && fIdx > -1) targetUser.followers.splice(fIdx, 1);
-            else if(idx === -1 && fIdx === -1) targetUser.followers.push(currentUser.username);
-        }
-
-        localStorage.setItem('vb_current_user', JSON.stringify(currentUser));
-        localStorage.setItem('vb_users', JSON.stringify(users));
-        openExplore();
-    }
-
-    function likePost(postId) {
-        let post = posts.find(p => p.id === postId);
-        if(!post) return;
-        let idx = post.likes.indexOf(currentUser.username);
-        if(idx > -1) {
-            post.likes.splice(idx, 1);
-        } else {
-            post.likes.push(currentUser.username);
-        }
-        localStorage.setItem('vb_posts', JSON.stringify(posts));
-        renderFeed();
-    }
-
-    function addComment(postId) {
-        let input = document.getElementById(`comment-input-${postId}`);
-        let text = input.value.trim();
-        if(!text) return;
-
-        let post = posts.find(p => p.id === postId);
-        if(post) {
-            post.comments.push({ user: currentUser.username, text: text });
-            localStorage.setItem('vb_posts', JSON.stringify(posts));
-            renderFeed();
-        }
-    }
-
-    function reportPost(postId) {
-        let reason = prompt("Enter reason for reporting this post:");
-        if(reason) {
-            reports.push({ id: Date.now(), type: 'post', contentId: postId, reporter: currentUser.username, reason: reason });
-            localStorage.setItem('vb_reports', JSON.stringify(reports));
-            alert('Report submitted for admin review.');
-        }
-    }
-
-    function blockUser(username) {
-        if(confirm(`Block ${username}?`)) {
-            if(!currentUser.blocked) currentUser.blocked = [];
-            currentUser.blocked.push(username);
-            localStorage.setItem('vb_current_user', JSON.stringify(currentUser));
-            alert('User blocked.');
-            renderFeed();
-        }
-    }
-
-    function renderReels() {
-        let container = document.getElementById('feed-container');
-        if(reels.length === 0) {
-            container.innerHTML = `<div style="text-align:center; padding:40px; color:#fff; background:#000; height:100%;">No reels available.</div>`;
-            return;
-        }
-
-        container.innerHTML = `<div class="reels-container" id="reels-box"></div>`;
-        let box = document.getElementById('reels-box');
-
-        reels.forEach(reel => {
-            let div = document.createElement('div');
-            div.className = 'reel-item';
-            div.innerHTML = `
-                <video src="${reel.mediaUrl}" loop autoplay muted></video>
-                <div class="reel-overlay">
-                    <b>@${reel.username}</b>
-                    <p>${reel.caption || ''}</p>
-                </div>
-            `;
-            box.appendChild(div);
-        });
-    }
-
-    function openMessages() {
-        document.getElementById('messages-modal').classList.remove('hidden');
-        renderChatList();
-    }
-
-    function closeMessages() {
-        document.getElementById('messages-modal').classList.add('hidden');
-    }
-
-    function renderChatList() {
-        let content = document.getElementById('messages-content');
-        content.innerHTML = `<div id="chat-users-list"></div>`;
-        let list = document.getElementById('chat-users-list');
-        users.forEach(u => {
-            if(u.username !== currentUser.username) {
-                list.innerHTML += `
-                    <div class="chat-list-item" onclick="openChatWith('${u.username}')">
-                        <img src="https://via.placeholder.com/50">
-                        <div><b>${u.username}</b><p style="font-size:12px; color:#8e8e8e;">Tap to chat</p></div>
-                    </div>
-                `;
-            }
-        });
-    }
-
-    function openChatWith(username) {
-        let chatKey = [currentUser.username, username].sort().join('_');
-        let chat = chats.find(c => c.key === chatKey) || { key: chatKey, messages: [] };
-
-        let content = document.getElementById('messages-content');
-        document.getElementById('chat-header-title').innerText = username;
-
-        content.innerHTML = `
-            <div id="chat-messages" style="flex:1; overflow-y:auto; padding:15px; display:flex; flex-direction:column; gap:10px; max-height:65vh;"></div>
-            <div style="display:flex; padding:10px; border-top:1px solid #efefef; background:#fff;">
-                <input type="text" id="chat-msg-input" placeholder="Message..." style="flex:1; padding:10px; border:1px solid #dbdbdb; border-radius:20px; outline:none; background:#fafafa;">
-                <button onclick="sendChatMessage('${chatKey}')" style="background:none; border:none; color:#0095f6; font-weight:600; margin-left:10px; cursor:pointer;">Send</button>
-            </div>
+      if (!sorted.length) {
+        container.innerHTML = `
+          <div class="sm:col-span-2 bg-surface border border-zinc-800/80 rounded-2xl p-10 text-center space-y-2">
+            <div class="text-2xl">🎬</div>
+            <div class="text-sm font-semibold text-zinc-200">No Reels posted yet</div>
+            <p class="text-xs text-zinc-400 max-w-sm mx-auto">
+              Reels are permanent and stay visible forever — even after 24 hours. Post a Reel to get started.
+            </p>
+            <button onclick="openCreateModal('reel')" class="mt-2 px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 text-xs font-semibold text-white transition">Create First Reel</button>
+          </div>
         `;
+        return;
+      }
 
-        renderChatMessages(chat);
+      container.innerHTML = sorted.map(r => renderFeedCard('reels', r)).join('');
     }
 
-    function renderChatMessages(chat) {
-        let box = document.getElementById('chat-messages');
-        if(!box) return;
-        box.innerHTML = chat.messages.map(m => `
-            <div style="align-self: ${m.sender === currentUser.username ? 'flex-end' : 'flex-start'}; background:#efefef; padding:8px 12px; border-radius:12px; max-width:70%;">
-                <span style="font-size:13px;">${m.text}</span>
+    function renderFeedCard(colName, item) {
+      const likes = Array.isArray(item.likes) ? item.likes : [];
+      const liked = state.currentUser && likes.includes(state.currentUser.id);
+      const comments = Array.isArray(item.comments) ? item.comments : [];
+      const canDelete = state.currentUser && (state.currentUser.id === item.authorId || state.currentUser.role === 'admin');
+
+      let mediaBlock = '';
+      if (item.mediaUrl) {
+        mediaBlock = item.mediaKind === 'video'
+          ? `<video src="${escapeHtml(item.mediaUrl)}" controls playsinline class="w-full max-h-[420px] object-cover bg-black"></video>`
+          : `<img src="${escapeHtml(item.mediaUrl)}" alt="Media" class="w-full max-h-[420px] object-cover bg-black" />`;
+      }
+
+      const commentsHtml = comments.map(c => `
+        <div class="text-xs text-zinc-300">
+          <span class="font-semibold text-zinc-100">@${escapeHtml(c.authorUsername)}</span>
+          <span class="text-zinc-300 ml-1">${escapeHtml(c.text)}</span>
+        </div>
+      `).join('');
+
+      return `
+        <article class="bg-surface border border-zinc-800/80 rounded-2xl overflow-hidden">
+          <div class="p-3.5 flex items-center justify-between">
+            <div class="flex items-center gap-2.5">
+              <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-600 to-pink-500 flex items-center justify-center text-xs font-bold">${escapeHtml((item.authorName || item.authorUsername || '?')[0].toUpperCase())}</div>
+              <div>
+                <div class="text-xs font-semibold">${escapeHtml(item.authorName || item.authorUsername)}</div>
+                <div class="text-[11px] text-zinc-400">@${escapeHtml(item.authorUsername)} • ${formatRelativeTime(item.createdAt)} • <span class="text-emerald-400/90">Permanent</span></div>
+              </div>
             </div>
-        `).join('');
-        box.scrollTop = box.scrollHeight;
-    }
+            ${canDelete ? `<button onclick="deleteItem('${colName}', '${item.id}')" class="text-xs text-zinc-500 hover:text-rose-400 px-2 py-1">Delete</button>` : ''}
+          </div>
 
-    function sendChatMessage(chatKey) {
-        let input = document.getElementById('chat-msg-input');
-        let text = input.value.trim();
-        if(!text) return;
+          ${mediaBlock}
 
-        let chat = chats.find(c => c.key === chatKey);
-        if(!chat) {
-            chat = { key: chatKey, messages: [] };
-            chats.push(chat);
-        }
+          <div class="p-3.5 space-y-3">
+            ${item.caption ? `<p class="text-sm text-zinc-100 whitespace-pre-line">${escapeHtml(item.caption)}</p>` : ''}
 
-        chat.messages.push({ sender: currentUser.username, text: text });
-        localStorage.setItem('vb_chats', JSON.stringify(chats));
-        input.value = '';
-        renderChatMessages(chat);
-    }
-
-    function openNewGroupModal() {
-        let groupName = prompt("Enter Group Name:");
-        if(groupName) {
-            let chatKey = 'group_' + Date.now();
-            chats.push({ key: chatKey, name: groupName, messages: [] });
-            localStorage.setItem('vb_chats', JSON.stringify(chats));
-            alert('Group created successfully!');
-            renderChatList();
-        }
-    }
-
-    function openNotesModal() {
-        document.getElementById('notes-modal').classList.remove('hidden');
-        renderNotes();
-    }
-
-    function closeNotesModal() {
-        document.getElementById('notes-modal').classList.add('hidden');
-    }
-
-    function saveNote() {
-        let text = document.getElementById('note-input').value.trim();
-        if(!text) return;
-        notes.push({ username: currentUser.username, text: text, time: Date.now() });
-        localStorage.setItem('vb_notes', JSON.stringify(notes));
-        document.getElementById('note-input').value = '';
-        renderNotes();
-    }
-
-    function renderNotes() {
-        let list = document.getElementById('notes-list');
-        list.innerHTML = notes.map(n => `
-            <div style="background:#fff; border:1px solid #efefef; padding:12px; border-radius:8px; margin-bottom:8px;">
-                <b>@${n.username}</b>: <span style="font-size:14px;">${n.text}</span>
+            <div class="flex items-center gap-4 pt-1 border-t border-zinc-800/60">
+              <button onclick="toggleLike('${colName}', '${item.id}')" class="text-xs font-medium flex items-center gap-1.5 ${liked ? 'text-pink-400' : 'text-zinc-400 hover:text-zinc-200'} transition">
+                <span>${liked ? '♥' : '♡'}</span><span>${likes.length}</span>
+              </button>
+              <span class="text-xs text-zinc-400">💬 ${comments.length}</span>
             </div>
-        `).join('');
+
+            ${comments.length ? `<div class="space-y-1 bg-zinc-900/60 rounded-xl p-2.5">${commentsHtml}</div>` : ''}
+
+            <form onsubmit="addComment(event, '${colName}', '${item.id}')" class="flex gap-2">
+              <input id="comment-input-${colName}-${item.id}" type="text" placeholder="Add a comment..." class="flex-1 px-3 py-1.5 rounded-xl bg-zinc-900 border border-zinc-800 focus:border-purple-500 focus:outline-none text-xs" />
+              <button type="submit" class="px-3 py-1.5 rounded-xl bg-elevated hover:bg-zinc-700 text-xs font-medium text-zinc-200 transition">Post</button>
+            </form>
+          </div>
+        </article>
+      `;
     }
 
-    function openAdminPanel() {
-        document.getElementById('admin-panel').classList.remove('hidden');
-        let list = document.getElementById('admin-reports-list');
-        if(reports.length === 0) {
-            list.innerHTML = `<p>No pending reports.</p>`;
-            return;
+    function renderNotesBar() {
+      const bar = document.getElementById('notesBar');
+      const activeNotes = state.notes
+        .filter(n => isWithin24Hours(n.createdAt))
+        .sort((a, b) => Number(b.createdAt) - Number(a.createdAt));
+
+      const myNote = state.currentUser
+        ? activeNotes.find(n => n.authorId === state.currentUser.id)
+        : null;
+
+      const myCard = `
+        <div class="shrink-0 w-32 bg-zinc-900/90 border border-zinc-800 rounded-2xl p-3 flex flex-col justify-between min-h-[96px]">
+          <div class="text-[11px] text-zinc-200 font-medium line-clamp-2 min-h-[28px]">
+            ${myNote ? escapeHtml(myNote.text) : '<span class="text-zinc-500 italic">No active note</span>'}
+          </div>
+          <div class="mt-2 pt-2 border-t border-zinc-800/80 flex items-center justify-between gap-1">
+            <button onclick="openNoteModal()" class="text-[11px] text-pink-400 hover:text-pink-300 font-medium">${myNote ? 'Edit' : '+ Note'}</button>
+            ${myNote ? `<button onclick="deleteMyNote()" class="text-[10px] text-zinc-500 hover:text-rose-400">Clear</button>` : ''}
+          </div>
+        </div>
+      `;
+
+      const otherCards = activeNotes
+        .filter(n => !state.currentUser || n.authorId !== state.currentUser.id)
+        .map(n => `
+          <div class="shrink-0 w-36 bg-zinc-900/70 border border-zinc-800/80 rounded-2xl p-3 space-y-1.5">
+            <div class="text-xs text-zinc-100 line-clamp-2">"${escapeHtml(n.text)}"</div>
+            <div class="text-[11px] font-semibold text-purple-300 truncate">@${escapeHtml(n.authorUsername)}</div>
+            <div class="text-[10px] text-zinc-500">${formatRemaining24h(n.createdAt)}</div>
+          </div>
+        `).join('');
+
+      bar.innerHTML = myCard + (otherCards || '<div class="text-xs text-zinc-500 self-center pl-2">No other 24h notes active.</div>');
+    }
+
+    function renderChats() {
+      const listEl = document.getElementById('chatThreadList');
+      if (!state.currentUser) return;
+
+      const myChats = state.chats
+        .filter(c => Array.isArray(c.members) && c.members.includes(state.currentUser.id))
+        .sort((a, b) => Number(b.updatedAt || b.createdAt || 0) - Number(a.updatedAt || a.createdAt || 0));
+
+      if (!myChats.length) {
+        listEl.innerHTML = '<p class="text-xs text-zinc-500 py-6 text-center">No chats yet. Click "+ New Chat".</p>';
+        document.getElementById('activeChatHeader').innerHTML = '<span class="text-sm font-semibold text-zinc-400">No conversation selected</span>';
+        document.getElementById('chatMessagesList').innerHTML = '<div class="text-xs text-zinc-500 text-center py-12">Start a direct or group chat to message users.</div>';
+        return;
+      }
+
+      if (!state.activeChatId || !myChats.some(c => c.id === state.activeChatId)) {
+        state.activeChatId = myChats[0].id;
+      }
+
+      const getChatLabel = (chat) => {
+        if (chat.title) return chat.title;
+        const peers = (chat.members || [])
+          .filter(id => id !== state.currentUser.id)
+          .map(id => {
+            const u = state.users.find(x => x.id === id);
+            return u ? `@${u.username}` : id;
+          });
+        return peers.join(', ') || 'Direct Chat';
+      };
+
+      listEl.innerHTML = myChats.map(c => {
+        const selected = c.id === state.activeChatId;
+        const lastMsg = (c.messages || []).slice(-1)[0];
+        return `
+          <button onclick="selectChat('${c.id}')" class="w-full text-left p-2.5 rounded-xl border transition ${selected ? 'bg-elevated border-purple-500/60' : 'bg-zinc-900/50 border-zinc-800/70 hover:bg-zinc-900'}">
+            <div class="text-xs font-semibold truncate">${escapeHtml(getChatLabel(c))}</div>
+            <div class="text-[11px] text-zinc-400 truncate mt-0.5">${lastMsg ? escapeHtml(lastMsg.text || lastMsg.emoji || 'Sticker') : 'No messages yet'}</div>
+          </button>
+        `;
+      }).join('');
+
+      const activeChat = myChats.find(c => c.id === state.activeChatId);
+      document.getElementById('activeChatHeader').innerHTML = `
+        <div>
+          <div class="text-sm font-bold">${escapeHtml(getChatLabel(activeChat))}</div>
+          <div class="text-[11px] text-zinc-400">${(activeChat.members || []).length} member(s)</div>
+        </div>
+      `;
+
+      const msgs = activeChat.messages || [];
+      const msgsEl = document.getElementById('chatMessagesList');
+      if (!msgs.length) {
+        msgsEl.innerHTML = '<div class="text-xs text-zinc-500 text-center py-10">No messages in this chat yet. Say hello!</div>';
+        return;
+      }
+
+      msgsEl.innerHTML = msgs.map(m => {
+        const mine = m.senderId === state.currentUser.id;
+        let bodyHtml = `<div class="text-xs">${escapeHtml(m.text)}</div>`;
+        if (m.kind === 'gif_sticker') {
+          bodyHtml = `<div class="text-2xl leading-none py-1">${escapeHtml(m.emoji || '✨')}</div><div class="text-[10px] opacity-80 mt-0.5">${escapeHtml(m.text)}</div>`;
+        } else if (m.kind === 'custom_sticker' && m.mediaUrl) {
+          bodyHtml = `<img src="${escapeHtml(m.mediaUrl)}" alt="Sticker" class="w-20 h-20 object-contain rounded-lg" />`;
         }
 
-        list.innerHTML = reports.map(r => `
-            <div style="background:#fff; border:1px solid #dbdbdb; padding:14px; border-radius:8px; margin-bottom:12px;">
-                <p><b>Type:</b> ${r.type}</p>
-                <p><b>Reporter:</b> ${r.reporter}</p>
-                <p><b>Reason:</b> ${r.reason}</p>
-                <button onclick="resolveReport(${r.id}, true)" style="background:#ed4956; color:white; border:none; padding:6px 12px; border-radius:6px; margin-top:8px; cursor:pointer;">Remove Content</button>
-                <button onclick="resolveReport(${r.id}, false)" style="background:#dbdbdb; border:none; padding:6px 12px; border-radius:6px; margin-top:8px; cursor:pointer; margin-left:6px;">Dismiss</button>
+        return `
+          <div class="flex flex-col ${mine ? 'items-end' : 'items-start'}">
+            <span class="text-[10px] text-zinc-500 mb-0.5 px-1">@${escapeHtml(m.senderUsername || 'user')}</span>
+            <div class="max-w-[78%] px-3 py-2 rounded-2xl ${mine ? 'bg-purple-600 text-white' : 'bg-zinc-800 text-zinc-100'}">
+              ${bodyHtml}
             </div>
-        `).join('');
+          </div>
+        `;
+      }).join('');
+      msgsEl.scrollTop = msgsEl.scrollHeight;
     }
 
-    function closeAdminPanel() {
-        document.getElementById('admin-panel').classList.add('hidden');
+    window.setProfileTab = function (tab) {
+      state.profileTab = tab;
+      ['posts', 'reels', 'stories'].forEach(t => {
+        const btn = document.getElementById(`profTab${t[0].toUpperCase() + t.slice(1)}`);
+        btn.className = t === tab
+          ? 'px-3.5 py-1.5 rounded-xl text-xs font-semibold bg-elevated text-white'
+          : 'px-3.5 py-1.5 rounded-xl text-xs font-medium text-zinc-400 hover:text-white';
+      });
+      renderProfile();
+    };
+
+    function renderProfile() {
+      const u = state.currentUser;
+      if (!u) return;
+      const myPosts = state.posts.filter(p => p.authorId === u.id);
+      const myReels = state.reels.filter(r => r.authorId === u.id);
+      const myActiveStories = state.stories.filter(s => s.authorId === u.id && isWithin24Hours(s.createdAt));
+
+      document.getElementById('profileHeaderCard').innerHTML = `
+        <div class="flex flex-wrap items-center justify-between gap-4">
+          <div class="flex items-center gap-3.5">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-purple-600 via-pink-500 to-amber-400 flex items-center justify-center text-xl font-extrabold">${escapeHtml((u.displayName || u.username)[0].toUpperCase())}</div>
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="text-base font-bold">${escapeHtml(u.displayName || u.username)}</h2>
+                ${u.role === 'admin' ? '<span class="text-[10px] px-2 py-0.5 rounded-full bg-purple-500/20 text-purple-300 border border-purple-500/30">Admin</span>' : ''}
+              </div>
+              <div class="text-xs text-zinc-400">@${escapeHtml(u.username)}</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-4 text-center text-xs">
+            <div><div class="font-bold text-sm">${myPosts.length}</div><div class="text-zinc-400">Posts</div></div>
+            <div><div class="font-bold text-sm">${myReels.length}</div><div class="text-zinc-400">Reels</div></div>
+            <div><div class="font-bold text-sm">${myActiveStories.length}</div><div class="text-zinc-400">24h Stories</div></div>
+          </div>
+        </div>
+      `;
+
+      const grid = document.getElementById('profileItemsGrid');
+      if (state.profileTab === 'posts') {
+        grid.innerHTML = myPosts.length
+          ? myPosts.map(p => renderFeedCard('posts', p)).join('')
+          : '<p class="sm:col-span-2 text-xs text-zinc-500 text-center py-8">You have not published any permanent posts yet.</p>';
+      } else if (state.profileTab === 'reels') {
+        grid.innerHTML = myReels.length
+          ? myReels.map(r => renderFeedCard('reels', r)).join('')
+          : '<p class="sm:col-span-2 text-xs text-zinc-500 text-center py-8">You have not published any permanent reels yet.</p>';
+      } else {
+        grid.innerHTML = myActiveStories.length
+          ? myActiveStories.map(s => `
+              <div onclick="openStoryViewer('${s.id}')" class="cursor-pointer bg-zinc-900 border border-zinc-800 rounded-2xl p-4 flex items-center justify-between hover:border-purple-500/50 transition">
+                <div class="text-xs text-zinc-200 truncate pr-2">${escapeHtml(s.caption || 'Media Story')}</div>
+                <span class="text-[11px] text-purple-300 shrink-0">${formatRemaining24h(s.createdAt)}</span>
+              </div>
+            `).join('')
+          : '<p class="sm:col-span-2 text-xs text-zinc-500 text-center py-8">No active 24-hour stories right now.</p>';
+      }
     }
 
-    function resolveReport(reportId, remove) {
-        let report = reports.find(r => r.id === reportId);
-        if(report && remove) {
-            posts = posts.filter(p => p.id !== report.contentId);
-            localStorage.setItem('vb_posts', JSON.stringify(posts));
+    function renderAdminPanel() {
+      if (!state.currentUser || state.currentUser.role !== 'admin') return;
+      const activeStoriesCount = state.stories.filter(s => isWithin24Hours(s.createdAt)).length;
+      const activeNotesCount = state.notes.filter(n => isWithin24Hours(n.createdAt)).length;
+
+      document.getElementById('adminStatsGrid').innerHTML = `
+        <div class="p-3 rounded-xl bg-zinc-900 border border-zinc-800"><div class="text-lg font-bold">${state.users.length}</div><div class="text-[11px] text-zinc-400">Users</div></div>
+        <div class="p-3 rounded-xl bg-zinc-900 border border-zinc-800"><div class="text-lg font-bold">${state.posts.length + state.reels.length}</div><div class="text-[11px] text-zinc-400">Permanent Posts &amp; Reels</div></div>
+        <div class="p-3 rounded-xl bg-zinc-900 border border-zinc-800"><div class="text-lg font-bold">${activeStoriesCount}</div><div class="text-[11px] text-zinc-400">Active 24h Stories</div></div>
+        <div class="p-3 rounded-xl bg-zinc-900 border border-zinc-800"><div class="text-lg font-bold">${activeNotesCount}</div><div class="text-[11px] text-zinc-400">Active 24h Notes</div></div>
+      `;
+
+      document.getElementById('adminUsersList').innerHTML = state.users.map(u => `
+        <div class="flex items-center justify-between gap-2 p-3 rounded-xl bg-zinc-900 border border-zinc-800">
+          <div>
+            <div class="text-xs font-semibold">${escapeHtml(u.displayName || u.username)} <span class="text-zinc-400 font-normal">@${escapeHtml(u.username)}</span></div>
+            <div class="text-[11px] ${u.suspended ? 'text-rose-400' : 'text-emerald-400'}">${u.suspended ? 'Suspended' : 'Active'} • Role: ${escapeHtml(u.role || 'user')}</div>
+          </div>
+          ${u.id !== state.currentUser.id ? `
+            <button onclick="toggleSuspendUser('${u.id}')" class="px-3 py-1.5 rounded-lg text-xs font-medium ${u.suspended ? 'bg-emerald-600/20 text-emerald-300 hover:bg-emerald-600/30' : 'bg-rose-600/20 text-rose-300 hover:bg-rose-600/30'} transition">
+              ${u.suspended ? 'Reinstate' : 'Suspend'}
+            </button>
+          ` : '<span class="text-[11px] text-zinc-500">You</span>'}
+        </div>
+      `).join('');
+    }
+
+    // --- BOOTSTRAP ---
+    async function init() {
+      initStickerCanvas();
+      updateSyncBadges();
+
+      const savedFb = localStorage.getItem(STORAGE_KEYS.firebaseConfig);
+      if (savedFb) {
+        try {
+          await connectFirebase(JSON.parse(savedFb), true);
+        } catch {
+          refreshSandboxState();
         }
-        reports = reports.filter(r => r.id !== reportId);
-        localStorage.setItem('vb_reports', JSON.stringify(reports));
-        openAdminPanel();
-        renderFeed();
+      } else {
+        refreshSandboxState();
+      }
+
+      if (state.currentUser && !state.currentUser.suspended) {
+        enterApp();
+      } else {
+        document.getElementById('authScreen').classList.remove('hidden');
+      }
+
+      // Periodically re-render 24h timers & expirations
+      setInterval(() => {
+        if (state.currentUser) {
+          renderStoriesBar();
+          renderNotesBar();
+        }
+      }, 30000);
     }
 
-    function openProfile() {
-        alert(`Logged in as @${currentUser.username}\nFollowing: ${(currentUser.following || []).length}\nFollowers: ${(currentUser.followers || []).length}`);
-    }
-</script>
+    init();
+  </script>
 </body>
 </html>
