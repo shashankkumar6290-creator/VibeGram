@@ -1067,7 +1067,107 @@
       };
       reader.readAsDataURL(file);
     };
+function getYouTubeEmbedUrl(url) {
+  const match = url.match(/(?:youtube\.com\/(?:watch\?v=|shorts\/|embed\/)|youtu\.be\/)([A-Za-z0-9_-]{11})/);
+  return match ? `https://www.youtube.com/embed/${match[1]}` : null;
+}
 
+function getInstagramEmbedUrl(url) {
+  const match = url.match(/instagram\.com\/(reel|reels|p|tv)\/([A-Za-z0-9_-]+)/);
+  if (!match) return null;
+  const type = match[1].startsWith('reel') ? 'reel' : 'p';
+  return `https://www.instagram.com/${type}/${match[2]}/embed`;
+}
+
+function getTikTokEmbedUrl(url) {
+  const match = url.match(/tiktok\.com\/@[^/]+\/(?:video|photo)\/(\d+)/);
+  return match ? `https://www.tiktok.com/player/v1/${match[1]}` : null;
+}
+
+function getSnapchatEmbedUrl(url) {
+  const spotlightMatch = url.match(/snapchat\.com\/spotlight\/([A-Za-z0-9_-]+)/);
+  if (spotlightMatch) {
+    return `https://www.snapchat.com/spotlight/${spotlightMatch[1]}/embed`;
+  }
+  return null;
+}
+
+function renderFallbackCard(url, label) {
+  return `
+    <div style="padding:14px;border:1px solid rgba(255,255,255,0.12);border-radius:10px;background:rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:space-between;gap:10px;">
+      <span style="font-size:13px;opacity:0.85;">${label}</span>
+      <a href="${url}" target="_blank" rel="noopener noreferrer" style="padding:6px 12px;border-radius:8px;background:#7c3aed;color:#fff;text-decoration:none;font-size:12px;font-weight:600;">Open Link</a>
+    </div>`;
+}
+
+function renderMediaHtml(mediaUrl) {
+  if (!mediaUrl) return '';
+  const trimmed = mediaUrl.trim();
+
+  // 1. YouTube
+  const ytEmbed = getYouTubeEmbedUrl(trimmed);
+  if (ytEmbed) {
+    return `
+      <div style="position:relative;width:100%;aspect-ratio:16/9;overflow:hidden;border-radius:10px;">
+        <iframe src="${ytEmbed}" style="width:100%;height:100%;border:0;" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+      </div>`;
+  }
+
+  // 2. Instagram
+  const igEmbed = getInstagramEmbedUrl(trimmed);
+  if (igEmbed) {
+    return `
+      <div style="border-radius:10px;overflow:hidden;background:#000;">
+        <iframe src="${igEmbed}" style="width:100%;min-height:440px;border:0;" scrolling="no" allowtransparency="true" loading="lazy"></iframe>
+        <div style="padding:6px 10px;font-size:12px;text-align:right;">
+          <a href="${trimmed}" target="_blank" rel="noopener noreferrer">Open on Instagram ↗</a>
+        </div>
+      </div>`;
+  }
+
+  // 3. TikTok
+  if (/tiktok\.com/i.test(trimmed)) {
+    const ttEmbed = getTikTokEmbedUrl(trimmed);
+    if (ttEmbed) {
+      return `
+        <div style="border-radius:10px;overflow:hidden;background:#000;">
+          <iframe src="${ttEmbed}" style="width:100%;height:520px;border:0;" allow="encrypted-media; fullscreen" allowfullscreen loading="lazy"></iframe>
+          <div style="padding:6px 10px;font-size:12px;text-align:right;">
+            <a href="${trimmed}" target="_blank" rel="noopener noreferrer">Open on TikTok ↗</a>
+          </div>
+        </div>`;
+    }
+    return renderFallbackCard(trimmed, 'TikTok Video (use full @username/video/ID link to embed)');
+  }
+
+  // 4. Snapchat
+  if (/snapchat\.com/i.test(trimmed)) {
+    const scEmbed = getSnapchatEmbedUrl(trimmed);
+    if (scEmbed) {
+      return `
+        <div style="border-radius:10px;overflow:hidden;background:#000;">
+          <iframe src="${scEmbed}" style="width:100%;height:500px;border:0;" allowfullscreen loading="lazy"></iframe>
+          <div style="padding:6px 10px;font-size:12px;text-align:right;">
+            <a href="${trimmed}" target="_blank" rel="noopener noreferrer">Open on Snapchat ↗</a>
+          </div>
+        </div>`;
+    }
+    return renderFallbackCard(trimmed, 'Snapchat Video (use a public Spotlight link to embed)');
+  }
+
+  // 5. Direct MP4 / WebM / Ogg or base64 video
+  if (/(\.mp4|\.webm|\.ogg)(\?.*)?$/i.test(trimmed) || trimmed.startsWith('data:video/')) {
+    return `<video src="${trimmed}" controls playsinline preload="metadata" style="width:100%;max-height:480px;border-radius:10px;"></video>`;
+  }
+
+  // 6. Direct Image with clean fallback
+  return `
+    <img src="${trimmed}" alt="Post media" loading="lazy" style="width:100%;max-height:480px;object-fit:cover;border-radius:10px;" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';" />
+    <div style="display:none;padding:14px;border:1px solid rgba(255,255,255,0.12);border-radius:10px;align-items:center;justify-content:space-between;gap:10px;">
+      <span style="font-size:13px;opacity:0.85;">Preview unavailable for this link</span>
+      <a href="${trimmed}" target="_blank" rel="noopener noreferrer" style="padding:6px 12px;border-radius:8px;background:#7c3aed;color:#fff;text-decoration:none;font-size:12px;font-weight:600;">Open Link</a>
+    </div>`;
+}
     window.handleMediaUrlInput = function (e) {
       const url = e.target.value.trim();
       if (!url) {
