@@ -124,6 +124,16 @@
         </button>
       </div>
     </header>
+<div id="userSearchSection" class="lg:hidden px-4 py-2 border-b border-zinc-800/80 bg-zinc-950/70 space-y-2">
+  <input
+    id="accountSearchInput"
+    type="text"
+    placeholder="Search accounts by username or name..."
+    oninput="window.handleAccountSearch(this.value)"
+    class="w-full px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-700 text-sm text-white outline-none focus:border-purple-500"
+  />
+  <div id="accountSearchResults" class="space-y-1.5 text-sm"></div>
+</div>
 
     <!-- Desktop Left Sidebar -->
     <aside class="hidden lg:flex lg:flex-col lg:w-64 lg:fixed lg:inset-y-0 bg-surface border-r border-zinc-800/80 p-4 justify-between z-30">
@@ -1182,6 +1192,161 @@ function renderMediaHtml(mediaUrl) {
       state.draftMediaKind = /\.(mp4|webm|ogg|mov)(\?|$)/i.test(url) ? 'video' : 'image';
       renderCreatePreview();
     };
+function getFollowingList(user = state.currentUser) {
+  return Array.isArray(user?.following) ? user.following : [];
+}
+
+function getBlockedList(user = state.currentUser) {
+  return Array.isArray(user?.blockedUsers) ? user.blockedUsers : [];
+}
+
+// Returns true if currentUser blocked targetUserId OR targetUserId blocked currentUser
+window.isBlockedEitherWay = function (targetUserId) {
+  if (!state.currentUser || !targetUserId) return false;
+  const myId = state.currentUser.id;
+  const users = Array.isArray(state.users) ? state.users : [];
+  const targetUser = users.find(u => u && u.id === targetUserId);
+
+  const iBlockedThem = getBlockedList(state.currentUser).includes(targetUserId);
+  const theyBlockedMe = targetUser ? getBlockedList(targetUser).includes(myId) : false;
+
+  return iBlockedThem || theyBlockedMe;
+};
+
+// Call this before opening a DM, sending a message, or contacting another user
+window.canContactUser = function (targetUserId) {
+  if (!state.currentUser || !targetUserId || state.currentUser.id === targetUserId) return false;
+  if (window.isBlockedEitherWay(targetUserId)) {
+    if (typeof showToast === 'function') {
+      showToast('You cannot contact this account because of a block.', 'error');
+    }
+    return false;
+  }
+  return true;
+};
+
+window.toggleFollowUser = async function (targetUserId) {
+  if (!state.currentUser || !targetUserId || state.currentUser.id === targetUserId) return;
+
+  if (window.isBlockedEitherWay(targetUserId)) {
+    if (typeof showToast === 'function') {
+      showToast('Cannot follow while a block is active.', 'error');
+    }
+    return;
+  }
+
+  state.currentUser.following = getFollowingList(state.currentUser);
+  const idx = state.currentUser.following.indexOf(targetUserId);
+
+  if (idx === -1) {
+    state.currentUser.following.push(targetUserId);
+  } else {
+    state.currentUser.following.splice(idx, 1);
+  }
+
+  if (typeof window.persistUserRelations === 'function') {
+    await window.persistUserRelations(state.currentUser);
+  }
+
+  const query = document.getElementById('accountSearchInput')?.value || '';
+  window.handleAccountSearch(query);
+};
+
+window.toggleBlockUser = async function (targetUserId) {
+  if (!state.currentUser || !targetUserId || state.currentUser.id === targetUserId) return;
+
+  state.currentUser.blockedUsers = getBlockedList(state.currentUser);
+  state.currentUser.following = getFollowingList(state.currentUser);
+
+  const idx = state.currentUser.blockedUsers.indexOf(targetUserId);
+
+  if (idx === -1) {
+    // Block user and automatically unfollow them
+    state.currentUser.blockedUsers.push(targetUserId);
+    state.currentUser.following = state.currentUser.following.filter(id => id !== targetUserId);
+    if (typeof showToast === 'function') {
+      showToast('Account blocked. They can no longer contact you.', 'info');
+    }
+  } else {
+    // Unblock user
+    state.currentUser.blockedUsers.splice(idx, 1);
+    if (typeof showToast === 'function') {
+      showToast('Account unblocked.', 'info');
+    }
+  }
+
+  if (typeof window.persistUserRelations === 'function') {
+    await window.persistUserRelations(state.currentUser);
+  }
+
+  const query = document.getElementById('accountSearchInput')?.value || '';
+  window.handleAccountSearch(query);
+};
+
+window.handleAccountSearch = function (rawQuery) {
+  const resultsEl = document.getElementById('accountSearchResults');
+  if (!resultsEl) return;
+
+  const q = (rawQuery || '').trim().toLowerCase();
+  if (!q) {
+    resultsEl.innerHTML = '';
+    return;
+  }
+
+  const users = Array.isArray(state.users) ? state.users : [];
+  const matches = users.filter(u => {
+    if (!u || !state.currentUser || u.id === state.currentUser.id) return false;
+    // Hide users who have blocked the current user
+    if (getBlockedList(u).includes(state.currentUser.id)) return false;
+
+    const uname = (u.username || '').toLowerCase();
+    const name = (u.displayName || u.name || '').toLowerCase();
+    return uname.includes(q) || name.includes(q);
+  });
+
+  if (!matches.length) {
+    resultsEl.innerHTML = `<div class="text-zinc-400 py-1">No matching accounts found.</div>`;
+    return;
+  }
+
+  const following = getFollowingList(state.currentUser);
+  const blocked = getBlockedList(state.currentUser);
+
+  resultsEl.innerHTML = matches.map(u => {
+    const isFollowing = following.includes(u.id);
+    const isBlocked = blocked.includes(u.id);
+    const rawName = u.displayName || u.name || u.username || 'User';
+    const safeName = typeof escapeHtml === 'function' ? escapeHtml(rawName) : rawName;
+    const safeHandle = typeof escapeHtml === 'function' ? escapeHtml(u.username || '') : (u.username || '');
+
+    return `
+      <div class="flex items-center justify-between gap-2 p-2 rounded-lg bg-zinc-950/80 border border-zinc-800">
+        <div>
+          <div class="font-medium text-white">${safeName}</div>
+          ${safeHandle ? `<div class="text-xs text-zinc-400">@${safeHandle}</div>` : ''}
+        </div>
+        <div class="flex items-center gap-2">
+          ${!isBlocked ? `
+            <button
+              type="button"
+              onclick="window.toggleFollowUser('${u.id}')"
+              class="px-3 py-1 rounded-lg text-xs font-semibold ${isFollowing ? 'bg-zinc-800 text-zinc-200' : 'bg-purple-600 text-white'}"
+            >
+              ${isFollowing ? 'Following' : 'Follow'}
+            </button>
+          ` : ''}
+          <button
+            type="button"
+            onclick="window.toggleBlockUser('${u.id}')"
+            class="px-3 py-1 rounded-lg text-xs font-semibold ${isBlocked ? 'bg-amber-600 text-white' : 'bg-red-900/60 text-red-200 border border-red-700/60'}"
+          >
+            ${isBlocked ? 'Unblock' : 'Block'}
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+};
 
     function renderCreatePreview() {
       const box = document.getElementById('createPreviewBox');
@@ -1486,6 +1651,16 @@ function renderMediaHtml(mediaUrl) {
         showToast('Select or start a chat first.', 'error');
         return;
       }
+       const chatRecipientId =
+    (typeof state.activeChatUserId === 'string' && state.activeChatUserId) ||
+    (typeof state.activeChatId === 'string'
+      ? state.activeChatId.replace(state.currentUser.id, '').replace(/^[_:-]+|[_:-]+$/g, '')
+      : '');
+
+  if (chatRecipientId && typeof window.canContactUser === 'function' && !window.canContactUser(chatRecipientId)) {
+    return;
+  }
+
       const input = document.getElementById('chatMessageInput');
       const text = input.value.trim();
       if (!text) return;
