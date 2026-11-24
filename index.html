@@ -1924,10 +1924,17 @@ const DEFAULT_FIREBASE_CONFIG = {
   appId: "1:176054316441:web:31dbab7d52055b390d7708"
 };
 
-if (typeof connectFirebase === "function") {
-  connectFirebase(DEFAULT_FIREBASE_CONFIG, true);
+Object.keys(localStorage).forEach(key => {
+  if (key.toLowerCase().includes('firebase')) {
+    localStorage.setItem(key, JSON.stringify(DEFAULT_FIREBASE_CONFIG));
+  }
+});
+
+if (!Object.keys(localStorage).some(k => k.toLowerCase().includes('firebase'))) {
+  localStorage.setItem('vibegram_firebase_config', JSON.stringify(DEFAULT_FIREBASE_CONFIG));
 }
-    init();
+
+init();
   </script>
 </body>
 </html>
