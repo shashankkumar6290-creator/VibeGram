@@ -1915,7 +1915,18 @@
         }
       }, 30000);
     }
+const DEFAULT_FIREBASE_CONFIG = {
+  apiKey: "AIzaSyAWUdxjVPc1tQa1g7Tu4B6MsK54KqS51s",
+  authDomain: "vibegram-6985f.firebaseapp.com",
+  projectId: "vibegram-6985f",
+  storageBucket: "vibegram-6985f.firebasestorage.app",
+  messagingSenderId: "176054316441",
+  appId: "1:176054316441:web:31dbab7d52055b390d7708"
+};
 
+if (typeof connectFirebase === "function") {
+  connectFirebase(DEFAULT_FIREBASE_CONFIG, true);
+}
     init();
   </script>
 </body>
