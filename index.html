@@ -1192,11 +1192,8 @@ function renderMediaHtml(mediaUrl) {
         return;
       }
       box.classList.remove('hidden');
-      if (state.draftMediaKind === 'video') {
-        content.innerHTML = `<video src="${escapeHtml(state.draftMediaDataUrl)}" controls class="max-h-52 rounded-lg"></video>`;
-      } else {
-        content.innerHTML = `<img src="${escapeHtml(state.draftMediaDataUrl)}" alt="Preview" class="max-h-52 object-contain rounded-lg" />`;
-      }
+      content.innerHTML = renderMediaHtml(state.draftMediaDataUrl);
+
     }
 
     window.handleCreateSubmit = async function (e) {
@@ -1278,12 +1275,8 @@ function renderMediaHtml(mediaUrl) {
       `;
       document.getElementById('storyViewerExpiry').textContent = formatRemaining24h(story.createdAt);
 
-      let mediaHtml = '';
-      if (story.mediaUrl) {
-        mediaHtml = story.mediaKind === 'video'
-          ? `<video src="${escapeHtml(story.mediaUrl)}" controls autoplay class="max-h-72 rounded-xl mb-3"></video>`
-          : `<img src="${escapeHtml(story.mediaUrl)}" alt="Story" class="max-h-72 object-contain rounded-xl mb-3" />`;
-      }
+      let mediaHtml = story.mediaUrl ? renderMediaHtml(story.mediaUrl) : '';
+
       const captionHtml = story.caption
         ? `<p class="text-sm text-zinc-100 px-2">${escapeHtml(story.caption)}</p>`
         : (!story.mediaUrl ? '<p class="text-sm text-zinc-400">Empty story</p>' : '');
@@ -1737,12 +1730,8 @@ function renderMediaHtml(mediaUrl) {
       const comments = Array.isArray(item.comments) ? item.comments : [];
       const canDelete = state.currentUser && (state.currentUser.id === item.authorId || state.currentUser.role === 'admin');
 
-      let mediaBlock = '';
-      if (item.mediaUrl) {
-        mediaBlock = item.mediaKind === 'video'
-          ? `<video src="${escapeHtml(item.mediaUrl)}" controls playsinline class="w-full max-h-[420px] object-cover bg-black"></video>`
-          : `<img src="${escapeHtml(item.mediaUrl)}" alt="Media" class="w-full max-h-[420px] object-cover bg-black" />`;
-      }
+      let mediaBlock = item.mediaUrl ? renderMediaHtml(item.mediaUrl) : '';
+
 
       const commentsHtml = comments.map(c => `
         <div class="text-xs text-zinc-300">
