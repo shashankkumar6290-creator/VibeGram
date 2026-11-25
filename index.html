@@ -1275,6 +1275,86 @@ window.persistUserRelations = async function (user) {
     console.error('Failed to persist user relations:', err);
   }
 };
+window.getFollowersList = function (targetUserId) {
+  if (!targetUserId) return [];
+  const pool = [];
+  if (Array.isArray(state.users)) pool.push(...state.users);
+  if (state.currentUser && state.currentUser.id) {
+    const idx = pool.findIndex(u => u && u.id === state.currentUser.id);
+    if (idx !== -1) pool[idx] = { ...pool[idx], ...state.currentUser };
+    else pool.push(state.currentUser);
+  }
+  const seenIds = new Set();
+  return pool.filter(u => {
+    if (!u || !u.id || seenIds.has(u.id) || u.id === targetUserId) return false;
+    seenIds.add(u.id);
+    let followingArr = Array.isArray(u.following) ? u.following : null;
+    if (!followingArr) {
+      try {
+        const saved = JSON.parse(localStorage.getItem(`relations_${u.id}`) || '{}');
+        if (Array.isArray(saved.following)) followingArr = saved.following;
+      } catch (e) {}
+    }
+    return Array.isArray(followingArr) && followingArr.includes(targetUserId);
+  });
+};
+
+window.getFollowerCount = function (targetUserId) {
+  return window.getFollowersList(targetUserId).length;
+};
+
+window.renderFollowerCount = function () {
+  document.querySelectorAll('[data-follower-count]').forEach(el => {
+    const uid = el.getAttribute('data-follower-count');
+    if (uid) {
+      el.textContent = `${window.getFollowerCount(uid)} followers`;
+    }
+  });
+};
+
+window.openFollowersModal = function (targetUserId) {
+  const followers = window.getFollowersList(targetUserId);
+  const existingModal = document.getElementById('followersListModal');
+  if (existingModal) existingModal.remove();
+
+  const itemsHtml = followers.length
+    ? followers.map(f => {
+        const uname = typeof escapeHtml === 'function' ? escapeHtml(f.username || f.id) : (f.username || f.id);
+        const dname = typeof escapeHtml === 'function' ? escapeHtml(f.displayName || f.username || f.id) : (f.displayName || f.username || f.id);
+        return `<div class="flex items-center justify-between py-2 border-b border-zinc-800 text-sm">
+          <div>
+            <div class="font-semibold text-white">${dname}</div>
+            <div class="text-xs text-zinc-400">@${uname}</div>
+          </div>
+        </div>`;
+      }).join('')
+    : `<div class="py-6 text-center text-sm text-zinc-400">No followers yet.</div>`;
+
+  const modal = document.createElement('div');
+  modal.id = 'followersListModal';
+  modal.className = 'fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4';
+  modal.innerHTML = `
+    <div class="w-full max-w-sm rounded-2xl bg-zinc-900 border border-zinc-800 p-4 text-white shadow-xl">
+      <div class="flex items-center justify-between pb-3 border-b border-zinc-800">
+        <h3 class="text-sm font-bold">Followers (${followers.length})</h3>
+        <button type="button" onclick="document.getElementById('followersListModal')?.remove()" class="text-zinc-400 hover:text-white text-sm px-2 py-1">✕</button>
+      </div>
+      <div class="max-h-72 overflow-y-auto mt-2">${itemsHtml}</div>
+    </div>
+  `;
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) modal.remove();
+  });
+  document.body.appendChild(modal);
+};
+
+document.addEventListener('click', function (e) {
+  const trigger = e.target.closest('[data-followers-list-trigger]');
+  if (trigger) {
+    const uid = trigger.getAttribute('data-followers-list-trigger');
+    if (uid) window.openFollowersModal(uid);
+  }
+});
 
 window.toggleFollowUser = async function (targetUserId) {
   if (!state.currentUser || !targetUserId || state.currentUser.id === targetUserId) return;
@@ -1298,6 +1378,9 @@ window.toggleFollowUser = async function (targetUserId) {
   if (typeof window.persistUserRelations === 'function') {
     await window.persistUserRelations(state.currentUser);
   }
+if (typeof window.renderFollowerCount === 'function') {
+  window.renderFollowerCount();
+}
 
   const query = document.getElementById('accountSearchInput')?.value || '';
   window.handleAccountSearch(query);
