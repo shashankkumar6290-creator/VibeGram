@@ -715,23 +715,35 @@ if (state.currentUser) {
         localStorage.setItem(STORAGE_KEYS.firebaseConfig, JSON.stringify(configObj));
         updateSyncBadges();
 
-        const watchCol = (colName, targetKey) => {
-          const unsub = onSnapshot(collection(db, colName), (snap) => {
-            const rows = [];
-            snap.forEach(d => rows.push({ id: d.id, ...d.data() }));
-            state[targetKey] = rows;
-            syncCurrentUserFromList();
-            if (state.currentUser && !state.currentUser.suspended) {
-              renderAll();
-            } else if (state.currentUser && state.currentUser.suspended) {
-              showToast('Your account was suspended by an admin.', 'error');
-              logoutUser();
-            }
-          }, (err) => {
-            if (!silent) showToast(`Firestore error (${colName}): ${err.message}`, 'error');
-          });
-          state.unsubs.push(unsub);
-        };
+const watchCol = (colName, targetKey) => {
+  const unsub = onSnapshot(
+    collection(db, colName),
+    (snap) => {
+      const rows = [];
+      snap.forEach((d) => rows.push({ id: d.id, ...d.data() }));
+      state[targetKey] = rows;
+      syncCurrentUserFromList();
+      if (state.currentUser && !state.currentUser.suspended) {
+        renderAll();
+        if (targetKey === 'chats' && state.activeChatId && typeof renderChatMessages === 'function') {
+          renderChatMessages();
+        }
+      } else if (state.currentUser && state.currentUser.suspended) {
+        showToast('Your account was suspended by an admin.', 'error');
+        logoutUser();
+      }
+    },
+    (err) => {
+      console.error(`Listener error on ${colName}:`, err);
+      setTimeout(() => {
+        if (state.cloudConnected && state.db) {
+          watchCol(colName, targetKey);
+        }
+      }, 2000);
+    }
+  );
+  return unsub;
+};
 
         watchCol('users', 'users');
         watchCol('posts', 'posts');
@@ -1827,21 +1839,29 @@ window.handleAccountSearch = function (rawQuery) {
     };
 
     async function appendMessageToChat(chatId, msg) {
-      const chat = state.chats.find(c => c.id === chatId);
-      if (!chat) return;
-      const nextMessages = [...(chat.messages || []), msg];
-      if (state.cloudConnected && state.db) {
-        await patchDoc('chats', chatId, {
-          messages: arrayUnion(msg),
-          updatedAt: nowMs()
-        });
-      } else {
-        await patchDoc('chats', chatId, {
+  const chat = state.chats.find((c) => c.id === chatId);
+  if (!chat) return;
+  const nextMessages = [...(chat.messages || []), msg];
+  chat.messages = nextMessages;
+  if (state.cloudConnected && state.db) {
+    try {
+      await patchDoc('chats', chatId, {
+        messages: arrayUnion(msg),
+        updatedAt: nowMs(),
+      });
+    } catch (err) {
+      try {
+        await writeDoc('chats', chatId, {
+          id: chatId,
           messages: nextMessages,
-          updatedAt: nowMs()
+          updatedAt: nowMs(),
         });
+      } catch (writeErr) {
+        showToast('Message sync failed: ' + writeErr.message, 'error');
       }
     }
+  }
+}
 
     // --- HTML5 CANVAS STICKER STUDIO ---
     let drawing = false;
