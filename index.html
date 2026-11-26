@@ -919,11 +919,16 @@ if (state.currentUser) {
           suspended: false,
           createdAt: Date.now()
         };
-        await writeDoc('users', userId, newUser);
-        localStorage.setItem(STORAGE_KEYS.session, userId);
-        state.currentUser = newUser;
-        showToast(isAdmin ? `Welcome @${rawHandle}! Admin privileges enabled.` : `Welcome @${rawHandle}!`, 'success');
-        enterApp();
+        try {
+  await writeDoc('users', userId, newUser);
+} catch (err) {
+  showToast('Could not connect to Firebase. Account not created.', 'error');
+  return;
+}
+localStorage.setItem(STORAGE_KEYS.session, userId);
+state.currentUser = newUser;
+showToast(isAdmin ? `Welcome @${rawHandle}! Admin privileges enabled.` : `Welcome @${rawHandle}!`, 'success');
+enterApp();
       } else {
         if (!existing) {
           showToast(`Account @${rawHandle} not found. Create an account first.`, 'error');
