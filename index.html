@@ -589,6 +589,7 @@
       stories: [],
       notes: [],
       chats: [],
+      reports: [],
       customStickers: []
     };
 
@@ -752,6 +753,7 @@ const watchCol = (colName, targetKey) => {
         watchCol('notes', 'notes');
         watchCol('chats', 'chats');
         watchCol('stickers', 'customStickers');
+        watchCol('reports', 'reports');
 
         if (!silent) {
           showToast('Connected to Firebase Firestore live sync.', 'success');
@@ -1806,6 +1808,61 @@ window.handleAccountSearch = function (rawQuery) {
         createdAt: nowMs()
       });
     };
+    let reportTargetUser = null;
+
+window.openReportModal = function (userId) {
+  if (!state.currentUser) return;
+  if (userId === state.currentUser.id) {
+    showToast("You cannot report your own account.", "error");
+    return;
+  }
+  const target = state.users.find((u) => u.id === userId);
+  if (!target) {
+    showToast("User not found.", "error");
+    return;
+  }
+  reportTargetUser = target;
+  document.getElementById("reportTargetLabel").textContent =
+    `Reporting @${target.username} (${target.displayName || target.username})`;
+  document.getElementById("reportDetailsInput").value = "";
+  const modal = document.getElementById("reportAccountModal");
+  modal.style.display = "flex";
+};
+
+window.closeReportModal = function () {
+  reportTargetUser = null;
+  document.getElementById("reportAccountModal").style.display = "none";
+};
+
+window.submitAccountReport = async function () {
+  if (!state.currentUser || !reportTargetUser) return;
+  const reason = document.getElementById("reportReasonSelect").value;
+  const details = document.getElementById("reportDetailsInput").value.trim();
+
+  const reportId = "rep_" + Date.now() + "_" + Math.random().toString(36).slice(2, 6);
+  const reportDoc = {
+    id: reportId,
+    reportedUserId: reportTargetUser.id,
+    reportedUsername: reportTargetUser.username,
+    reporterId: state.currentUser.id,
+    reporterUsername: state.currentUser.username,
+    reason,
+    details,
+    status: "pending",
+    createdAt: nowMs(),
+  };
+
+  try {
+    if (state.cloudConnected && state.db) {
+      await writeDoc("reports", reportId, reportDoc);
+    }
+    state.reports = [reportDoc, ...(state.reports || [])];
+    showToast(`Reported @${reportTargetUser.username}.`, "success");
+    closeReportModal();
+  } catch (err) {
+    showToast("Failed to submit report: " + err.message, "error");
+  }
+};
 
     window.handleSendMessage = async function (e) {
       e.preventDefault();
@@ -2198,13 +2255,19 @@ window.handleAccountSearch = function (rawQuery) {
       }).join('');
 
       const activeChat = myChats.find(c => c.id === state.activeChatId);
-      document.getElementById('activeChatHeader').innerHTML = `
-        <div>
-          <div class="text-sm font-bold">${escapeHtml(getChatLabel(activeChat))}</div>
-          <div class="text-[11px] text-zinc-400">${(activeChat.members || []).length} member(s)</div>
-        </div>
-      `;
+      const reportPeerId = activeChat && Array.isArray(activeChat.members)
+  ? activeChat.members.find(id => id !== state.currentUser.id)
+  : '';
 
+document.getElementById('activeChatHeader').innerHTML = `
+  <div class="flex items-center justify-between gap-2 w-full">
+    <div>
+      <div class="text-sm font-bold">${escapeHtml(getChatLabel(activeChat))}</div>
+      <div class="text-[11px] text-zinc-400">${(activeChat.members || []).length} member(s)</div>
+    </div>
+    ${reportPeerId ? `<button type="button" onclick="openReportModal('${escapeHtml(reportPeerId)}')" style="background:#ef4444;color:#fff;border:none;padding:4px 10px;border-radius:6px;font-size:12px;cursor:pointer;">Report</button>` : ''}
+  </div>
+`;
       const msgs = activeChat.messages || [];
       const msgsEl = document.getElementById('chatMessagesList');
       if (!msgs.length) {
@@ -2372,5 +2435,33 @@ if (!Object.keys(localStorage).some(k => k.toLowerCase().includes('firebase'))) 
 
 init();
   </script>
+  <div id="reportAccountModal" class="modal hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.65);display:none;align-items:center;justify-content:center;z-index:9999;">
+  <div style="background:#18181b;color:#fff;padding:20px;border-radius:14px;width:92%;max-width:420px;border:1px solid #27272a;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <h3 style="margin:0;font-size:18px;">Report Account</h3>
+      <button type="button" onclick="closeReportModal()" style="background:none;border:none;color:#a1a1aa;font-size:20px;cursor:pointer;">&times;</button>
+    </div>
+    <p id="reportTargetLabel" style="font-size:13px;color:#a1a1aa;margin-bottom:12px;"></p>
+
+    <label style="display:block;font-size:13px;margin-bottom:6px;">Select a reason</label>
+    <select id="reportReasonSelect" style="width:100%;padding:10px;border-radius:8px;background:#27272a;color:#fff;border:1px solid #3f3f46;margin-bottom:12px;">
+      <option value="Recent messages they sent you">Recent messages they sent you</option>
+      <option value="Hate speech or symbols">Hate speech or symbols</option>
+      <option value="Calling for violence">Calling for violence</option>
+      <option value="User's posts/stories/note/reel is violating the guidelines">User's posts/stories/note/reel is violating the guidelines</option>
+      <option value="Spam or impersonation">Spam or impersonation</option>
+      <option value="Harassment or bullying">Harassment or bullying</option>
+      <option value="Other">Other</option>
+    </select>
+
+    <label style="display:block;font-size:13px;margin-bottom:6px;">Additional details (optional)</label>
+    <textarea id="reportDetailsInput" rows="3" placeholder="Describe what happened..." style="width:100%;padding:10px;border-radius:8px;background:#27272a;color:#fff;border:1px solid #3f3f46;margin-bottom:14px;resize:vertical;"></textarea>
+
+    <div style="display:flex;justify-content:flex-end;gap:8px;">
+      <button type="button" onclick="closeReportModal()" style="padding:8px 14px;border-radius:8px;background:#27272a;color:#fff;border:none;cursor:pointer;">Cancel</button>
+      <button type="button" onclick="submitAccountReport()" style="padding:8px 14px;border-radius:8px;background:#ef4444;color:#fff;border:none;font-weight:600;cursor:pointer;">Submit Report</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
